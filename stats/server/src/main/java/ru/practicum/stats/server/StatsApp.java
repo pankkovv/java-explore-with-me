@@ -1,11 +1,11 @@
-package ru.practicum.stats;
+package ru.practicum.stats.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ExploreWithMeStats {
+public class StatsApp {
     public static void main(String[] args){
-        SpringApplication.run(ExploreWithMeStats.class, args);
+        SpringApplication.run(StatsApp.class, args);
     }
 }
