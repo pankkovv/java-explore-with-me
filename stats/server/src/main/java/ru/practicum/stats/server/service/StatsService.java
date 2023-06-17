@@ -5,8 +5,10 @@ import ru.practicum.stats.dto.RequestDto;
 import ru.practicum.stats.dto.RequestParams;
 import ru.practicum.stats.dto.ResponseDto;
 
-@Service
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
 public interface StatsService {
     void hit(RequestDto requestDto);
-    ResponseDto stats(RequestParams requestParams);
+    List<ResponseDto> stats(RequestParams requestParams) throws UnsupportedEncodingException;
 }

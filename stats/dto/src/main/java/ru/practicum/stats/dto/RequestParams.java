@@ -3,19 +3,19 @@ package ru.practicum.stats.dto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 public class RequestParams {
     private String start;
     private String end;
-    private List<String> uris;
+    private String[] uris;
     private boolean unique;
 
     public static RequestParams of(String start,
-                                  String end,
-                                  List<String> uris,
+                                   String end,
+                                  String[] uris,
                                   boolean unique){
         RequestParams request = new RequestParams();
         request.setStart(start);
