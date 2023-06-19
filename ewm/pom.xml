@@ -10,9 +10,9 @@
     </parent>
 
     <artifactId>ewm</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-    <name>Explore With Me EWM</name>
+    <name>General</name>
 
     <dependencies>
         <dependency>
