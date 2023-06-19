@@ -12,7 +12,7 @@ services:
       - POSTGRES_PASSWORD=stats
 
   stats-server:
-    build: ./stats/server
+    build: ./ewm-stats/ewm-stats-server
     image: stats_server_image
     container_name: stats_server_container
     ports:
@@ -37,7 +37,7 @@ services:
       - stats-server
 
   ewm-service:
-    build: ./ewm
+    build: ./ewm-main
     image: ewm_image
     container_name: ewm_container
     ports:
