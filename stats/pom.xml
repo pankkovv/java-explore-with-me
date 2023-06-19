@@ -4,16 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.5</version>
+        <groupId>ru.practicum</groupId>
+        <artifactId>explore-with-me</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
         <relativePath/>
     </parent>
 
-    <name>Explore With Me</name>
+    <name>Stats</name>
 
-    <groupId>ru.practicum</groupId>
-    <artifactId>explore-with-me</artifactId>
+    <artifactId>stats</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -23,8 +22,9 @@
     </properties>
 
     <modules>
-        <module>ewm</module>
-        <module>stats</module>
+        <module>dto</module>
+        <module>server</module>
+        <module>client</module>
     </modules>
 
     <build>
