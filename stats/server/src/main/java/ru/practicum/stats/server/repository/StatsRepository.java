@@ -1,40 +1,44 @@
 package ru.practicum.stats.server.repository;
 
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
-import ru.practicum.stats.server.model.Stat;
+import ru.practicum.stats.dto.ResponseDto;
+import ru.practicum.stats.server.model.Stats;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface StatsRepository extends JpaRepository<Stat, Long> {
+public interface StatsRepository extends JpaRepository<Stats, Long> {
 
-    @Query(value = "select s " +
-            "from stats as s " +
-            "where s.timestamp between ?1 and ?2 and " +
-            "lower(s.uri) ilike lower(?3) " +
-            "group by s.ip", nativeQuery = true)
-    List<Stat> findStatUriUnique(LocalDateTime start, LocalDateTime end, String uri);
-
-    @Query(value = "select s " +
-            "from stats as s " +
+    @Query("select new ru.practicum.stats.dto.ResponseDto(s.app, s.uri, count(s.app)) " +
+            "from Stats as s " +
             "where s.timestamp between ?1 and ?2 " +
-            "group by s.ip", nativeQuery = true)
-    List<Stat> findStatUnique(LocalDateTime start, LocalDateTime end);
+            "group by s.app, s.uri " +
+            "having count(s.ip) = 1 " +
+            "order by count(s.app) desc ")
+    List<ResponseDto> findStatUriUnique(LocalDateTime start, LocalDateTime end, String uri);
 
-    @Query(value = "select s " +
-            "from stats as s " +
+    @Query("select new ru.practicum.stats.dto.ResponseDto(s.app, s.uri, count(s.app))" +
+            "from Stats as s " +
             "where s.timestamp between ?1 and ?2 " +
-            "group by s.ip", nativeQuery = true)
-    List<Stat> findUriStat(LocalDateTime start, LocalDateTime end, String uri);
+            "group by s.app, s.uri " +
+            "order by count(s.app) desc ")
+    List<ResponseDto> findStatUri(LocalDateTime start, LocalDateTime end, String uri);
 
-    @Query(value = "select s " +
-            "from stats as s " +
+    @Query("select new ru.practicum.stats.dto.ResponseDto(s.app, s.uri, count(s.app))" +
+            "from Stats as s " +
             "where s.timestamp between ?1 and ?2 " +
-            "group by s.ip", nativeQuery = true)
-    List<Stat> findStat(LocalDateTime start, LocalDateTime end);
+            "group by s.app, s.uri " +
+            "having count(s.ip) = 1 " +
+            "order by count(s.app) desc ")
+    List<ResponseDto> findStatUnique(LocalDateTime start, LocalDateTime end);
+
+    @Query("select new ru.practicum.stats.dto.ResponseDto(s.app, s.uri, count(s.app))" +
+            "from Stats as s " +
+            "where s.timestamp between ?1 and ?2 " +
+            "group by s.app, s.uri " +
+            "order by count(s.app) desc ")
+    List<ResponseDto> findStat(LocalDateTime start, LocalDateTime end);
 }

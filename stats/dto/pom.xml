@@ -5,14 +5,14 @@
 
 	<parent>
 		<groupId>ru.practicum</groupId>
-		<artifactId>explore-with-me</artifactId>
+		<artifactId>stats</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>stats-dto</artifactId>
+	<artifactId>dto</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>EWM Stats-Dto</name>
+	<name>Stats Dto</name>
 
 	<dependencies>
 		<dependency>

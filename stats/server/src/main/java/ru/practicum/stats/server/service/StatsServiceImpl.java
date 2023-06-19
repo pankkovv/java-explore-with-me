@@ -4,16 +4,14 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.stats.dto.RequestDto;
-import ru.practicum.stats.dto.RequestParams;
 import ru.practicum.stats.dto.ResponseDto;
-import ru.practicum.stats.server.mapper.StatMap;
-import ru.practicum.stats.server.model.Stat;
+import ru.practicum.stats.server.exception.NotStatException;
+import ru.practicum.stats.server.exception.TimestampException;
+import ru.practicum.stats.server.mapper.StatsMapper;
+import ru.practicum.stats.server.messages.ExceptionMessages;
+import ru.practicum.stats.server.model.Stats;
 import ru.practicum.stats.server.repository.StatsRepository;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -26,36 +24,42 @@ public class StatsServiceImpl implements StatsService {
     private StatsRepository repository;
 
     @Override
-    public void hit(RequestDto requestDto) {
-        Stat state = StatMap.objFromDto(requestDto);
+    public ResponseDto hit(RequestDto requestDto) {
+        Stats state = StatsMapper.mapToStat(requestDto);
         state.setTimestamp(LocalDateTime.now());
-        repository.save(state);
+        return StatsMapper.mapToResponseDto(repository.save(state));
     }
 
     @Override
-    public List<ResponseDto> stats(RequestParams requestParams) throws UnsupportedEncodingException {
-        List<Stat> listStats = new ArrayList<>();
+    public List<ResponseDto> stats(String start, String end, String[] uri, boolean unique) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime timeStart = LocalDateTime.parse(start, formatter);
+        LocalDateTime timeEnd = LocalDateTime.parse(end, formatter);
+        List<ResponseDto> listResponseStat = new ArrayList<>();
 
-//        if(requestParams.isUnique()){
-//            if(requestParams.getUris() != null){
-//                for(String s : requestParams.getUris()){
-//                    repository.findStatUriUnique(LocalDateTime.parse(requestParams.getStart(), formatter), LocalDateTime.parse(requestParams.getStart(), formatter), s);
-//                }
-//            } else {
-//                repository.findStatUnique(LocalDateTime.parse(requestParams.getStart(), formatter), LocalDateTime.parse(requestParams.getStart(), formatter));
-//            }
-//        } else {
-//            if(requestParams.getUris() != null){
-//                for(String s : requestParams.getUris()){
-//                    repository.findUriStat(LocalDateTime.parse(requestParams.getStart(), formatter), LocalDateTime.parse(requestParams.getStart(), formatter), s);
-//                }
-//            } else {
-//                repository.findStat(LocalDateTime.parse(requestParams.getStart(), formatter), LocalDateTime.parse(requestParams.getStart(), formatter));
-//            }
-//        }
-        repository.findStatUnique(LocalDateTime.parse(URLEncoder.encode(requestParams.getStart(), StandardCharsets.UTF_8)), LocalDateTime.parse(URLEncoder.encode(requestParams.getStart(), StandardCharsets.UTF_8)));
+        if (timeStart.isAfter(timeEnd)) {
+            throw new TimestampException(ExceptionMessages.START_IS_AFTER_END.label);
+        }
+
+        if (uri != null) {
+            for (String u : uri) {
+                if (unique) {
+                    listResponseStat.addAll(repository.findStatUriUnique(timeStart, timeEnd, u));
+                }
+                listResponseStat.addAll(repository.findStatUri(timeStart, timeEnd, u));
+            }
+        }
+
+        if (unique) {
+            listResponseStat.addAll(repository.findStatUnique(timeStart, timeEnd));
+        }
+        listResponseStat.addAll(repository.findStat(timeStart, timeEnd));
 
 
-        return StatMap.objToListResponseDto(listStats);
+        if (listResponseStat.isEmpty()) {
+            throw new NotStatException(ExceptionMessages.NOT_FOUND_STATE.label);
+        } else {
+            return listResponseStat;
+        }
     }
 }
