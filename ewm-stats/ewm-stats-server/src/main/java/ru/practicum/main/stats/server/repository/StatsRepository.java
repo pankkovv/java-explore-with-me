@@ -17,6 +17,7 @@ public interface StatsRepository extends JpaRepository<Stats, Long> {
     @Query("select new ru.practicum.main.stats.dto.ResponseDto(s.app, s.uri, count(s.app)) " +
             "from Stats as s " +
             "where s.timestamp between ?1 and ?2 " +
+            "and lower(?3) ilike lower(s.uri) " +
             "group by s.app, s.uri " +
             "having count(s.ip) = 1 " +
             "order by count(s.app) desc ")
@@ -25,6 +26,7 @@ public interface StatsRepository extends JpaRepository<Stats, Long> {
     @Query("select new ru.practicum.main.stats.dto.ResponseDto(s.app, s.uri, count(s.app))" +
             "from Stats as s " +
             "where s.timestamp between ?1 and ?2 " +
+            "and lower(?3) ilike lower(s.uri) " +
             "group by s.app, s.uri " +
             "order by count(s.app) desc ")
     List<ResponseDto> findStatUri(LocalDateTime start, LocalDateTime end, String uri);
