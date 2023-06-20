@@ -1,4 +1,4 @@
-package ru.practicum.main.stats.client;
+package ru.practicum.main.stats.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.main.stats.dto.RequestDto;
-import ru.practicum.main.stats.model.BaseClient;
+import ru.practicum.main.stats.client.BaseClient;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public class StatsClient extends BaseClient {
     }
 
     public ResponseEntity<Object> hit(@RequestBody RequestDto requestDto) {
-        return post("/hit", requestDto);
+        return post("/hit", null, null, requestDto);
     }
 
     public ResponseEntity<Object> stats(String start,
@@ -39,6 +39,6 @@ public class StatsClient extends BaseClient {
                 "uris", uris,
                 "unique", unique
         );
-        return patch("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+        return patch("/stats?start={start}&end={end}&uris={uris}&unique={unique}", null, parameters, null);
     }
 }
