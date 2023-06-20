@@ -4,7 +4,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.stats.dto.RequestDto;
 import ru.practicum.main.stats.dto.ResponseDto;
@@ -39,7 +38,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ResponseDto> stats(String start, String end, String[] uri, boolean unique) {
+    public List<ResponseDto> stats(String start, String end, List<String> uri, boolean unique) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime timeStart = LocalDateTime.parse(start, formatter);
         LocalDateTime timeEnd = LocalDateTime.parse(end, formatter);
@@ -49,7 +48,7 @@ public class StatsServiceImpl implements StatsService {
             throw new TimestampException(ExceptionMessages.START_IS_AFTER_END.label);
         }
 
-        if (uri != null) {
+        if (!uri.isEmpty()) {
             for (String u : uri) {
                 if (unique) {
                     listResponseStat.addAll(repository.findStatUriUnique(timeStart, timeEnd, u));

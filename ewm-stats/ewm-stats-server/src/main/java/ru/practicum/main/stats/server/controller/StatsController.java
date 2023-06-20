@@ -31,7 +31,7 @@ public class StatsController {
     @GetMapping(path = "/stats")
     public List<ResponseDto> stats(@RequestParam(name = "start") String start,
                                    @RequestParam(name = "end") String end,
-                                   @RequestParam(name = "uris", required = false) String[] uris,
+                                   @RequestParam(name = "uris", required = false) List<String> uris,
                                    @RequestParam(name = "unique", defaultValue = "false") boolean unique) {
         log.debug(LogMessages.TRY_GET_STATS.label);
         return service.stats(start, end, uris, unique);
