@@ -15,7 +15,6 @@ import ru.practicum.main.stats.server.messages.LogMessages;
 import ru.practicum.main.stats.server.model.Stats;
 import ru.practicum.main.stats.server.repository.StatsRepository;
 
-import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
