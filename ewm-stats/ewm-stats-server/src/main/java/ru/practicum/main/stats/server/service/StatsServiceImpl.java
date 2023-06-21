@@ -18,7 +18,10 @@ import ru.practicum.main.stats.server.repository.StatsRepository;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @NoArgsConstructor
@@ -70,7 +73,7 @@ public class StatsServiceImpl implements StatsService {
             throw new NotStatException(ExceptionMessages.NOT_FOUND_STATE.label);
         } else {
             log.debug(LogMessages.GET_STATS.label);
-            return listResponseStat;
+            return listResponseStat.stream().sorted(Comparator.comparing(ResponseDto::getHits).reversed()).collect(Collectors.toList());
         }
     }
 }
