@@ -15,6 +15,7 @@ import ru.practicum.main.stats.server.messages.LogMessages;
 import ru.practicum.main.stats.server.model.Stats;
 import ru.practicum.main.stats.server.repository.StatsRepository;
 
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -49,19 +50,22 @@ public class StatsServiceImpl implements StatsService {
         }
 
         if (uri != null && !uri.isEmpty()) {
-            for (String u : uri) {
-                if (unique) {
+            if (unique) {
+                for (String u : uri) {
                     listResponseStat.addAll(repository.findStatUriUnique(timeStart, timeEnd, u));
                 }
-                listResponseStat.addAll(repository.findStatUri(timeStart, timeEnd, u));
+            } else {
+                for (String u : uri) {
+                    listResponseStat.addAll(repository.findStatUri(timeStart, timeEnd, u));
+                }
+            }
+        } else {
+            if (unique) {
+                listResponseStat.addAll(repository.findStatUnique(timeStart, timeEnd));
+            } else {
+                listResponseStat.addAll(repository.findStat(timeStart, timeEnd));
             }
         }
-
-        if (unique) {
-            listResponseStat.addAll(repository.findStatUnique(timeStart, timeEnd));
-        }
-        listResponseStat.addAll(repository.findStat(timeStart, timeEnd));
-
 
         if (listResponseStat.isEmpty()) {
             throw new NotStatException(ExceptionMessages.NOT_FOUND_STATE.label);
