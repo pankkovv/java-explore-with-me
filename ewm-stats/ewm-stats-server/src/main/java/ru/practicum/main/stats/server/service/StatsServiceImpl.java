@@ -48,7 +48,7 @@ public class StatsServiceImpl implements StatsService {
             throw new TimestampException(ExceptionMessages.START_IS_AFTER_END.label);
         }
 
-        if (!uri.isEmpty()) {
+        if (uri != null && !uri.isEmpty()) {
             for (String u : uri) {
                 if (unique) {
                     listResponseStat.addAll(repository.findStatUriUnique(timeStart, timeEnd, u));
