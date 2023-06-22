@@ -9,5 +9,5 @@ import java.util.List;
 public interface StatsService {
     ResponseDto hit(RequestDto requestDto);
 
-    List<ResponseDto> stats(String start, String end, String[] uri, boolean unique);
+    List<ResponseDto> stats(String start, String end, List<String> uri, boolean unique);
 }
