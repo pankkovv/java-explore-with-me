@@ -25,7 +25,7 @@ public class StatsClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> hit(@RequestBody RequestDto requestDto) {
+    public ResponseEntity<Object> hit(RequestDto requestDto) {
         return post("/hit", null, null, requestDto);
     }
 
