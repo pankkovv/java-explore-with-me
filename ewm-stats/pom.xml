@@ -12,6 +12,7 @@
     <groupId>ru.practicum.main.stats</groupId>
     <artifactId>ewm-stats</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>ewm-stats-dto</module>
         <module>ewm-stats-client</module>
