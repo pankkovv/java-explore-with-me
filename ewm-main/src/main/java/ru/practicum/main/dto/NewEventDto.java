@@ -1,13 +1,34 @@
 package ru.practicum.main.dto;
 
+import lombok.Builder;
+import lombok.Data;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+@Data
+@Builder
 public class NewEventDto {
+    @NotBlank
+    @Length(min = 20, max = 2000)
     private String annotation;
-    private CategoryDto category;
+    @NotNull
+    private int category;
+    @NotBlank
+    @Length(min = 20, max = 7000)
     private String description;
+    @NotBlank
     private String eventDate;
+    @NotNull
     private Location location;
-    private boolean paid;
-    private int participantLimit;
-    private boolean requestModeration;
+    @Builder.Default
+    private boolean paid = false;
+    @Builder.Default
+    private int participantLimit = 0;
+    @Builder.Default
+    private boolean requestModeration = true;
+    @NotBlank
+    @Length(min = 3, max = 120)
     private String title;
 }

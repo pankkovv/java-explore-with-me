@@ -1,6 +1,6 @@
 package ru.practicum.main.dto;
 
-public class EventsShortDto {
+public class EventShortDto {
     private String annotation;
     private CategoryDto category;
     private int confirmedRequests;
