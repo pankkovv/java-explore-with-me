@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.users.dto.NewUserRequest;
 import ru.practicum.main.users.dto.UserDto;
+import ru.practicum.main.users.model.User;
 import ru.practicum.main.users.repository.UsersRepository;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.util.ArrayList;
 import java.util.List;
 
-import static ru.practicum.main.users.mapper.UserMap.mapToUser;
-import static ru.practicum.main.users.mapper.UserMap.mapToUserDto;
+import static ru.practicum.main.users.mapper.UserMap.*;
 
 @Service
 @Transactional
@@ -26,7 +28,11 @@ public class AdminUsersServiceImpl implements AdminUsersService {
     @Override
     public List<UserDto> getUsers(List<Integer> ids, int from, int size) {
         Pageable page = paged(from, size);
-        return null;
+        List<User> listUser = new ArrayList<>();
+        for(Integer id : ids){
+            listUser.addAll(repository.findUsersById(id, page));
+        }
+        return mapToListUserDto(listUser);
     }
 
     @Override

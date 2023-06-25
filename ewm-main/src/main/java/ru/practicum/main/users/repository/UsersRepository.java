@@ -9,4 +9,5 @@ import java.util.List;
 
 @Repository
 public interface UsersRepository extends JpaRepository<User, Integer> {
+    List<User> findUsersById(int userId, Pageable page);
 }

@@ -1,16 +1,15 @@
 package ru.practicum.main.events.mapper;
 
-import ru.practicum.main.categories.dto.CategoryDto;
 import ru.practicum.main.categories.model.Category;
 import ru.practicum.main.events.dto.EventFullDto;
 import ru.practicum.main.events.dto.EventShortDto;
 import ru.practicum.main.events.dto.NewEventDto;
 import ru.practicum.main.events.enums.EventStatus;
 import ru.practicum.main.events.model.Event;
-import ru.practicum.main.users.dto.UserShortDto;
 import ru.practicum.main.users.model.User;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,19 +18,21 @@ import static ru.practicum.main.categories.mapper.CatMap.mapToCategoryDto;
 import static ru.practicum.main.users.mapper.UserMap.mapToUserShortDto;
 
 public class EventsMap {
-    public static Event mapToEvent(EventFullDto eventFullDto, User user){
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    public static Event mapToEvent(EventFullDto eventFullDto, User user) {
         return Event.builder()
                 .annotation(eventFullDto.getAnnotation())
                 .category(mapToCategory(eventFullDto.getCategory()))
                 .confirmedRequests(eventFullDto.getConfirmedRequests())
-                .createdOn(LocalDateTime.parse(eventFullDto.getCreatedOn()))
+                .createdOn(LocalDateTime.parse(eventFullDto.getCreatedOn(), formatter))
                 .description(eventFullDto.getDescription())
-                .eventDate(LocalDateTime.parse(eventFullDto.getEventDate()))
+                .eventDate(LocalDateTime.parse(eventFullDto.getEventDate(), formatter))
                 .initiator(user)
                 .location(eventFullDto.getLocation())
                 .paid(eventFullDto.isPaid())
                 .participantLimit(eventFullDto.getParticipantLimit())
-                .publishedOn(LocalDateTime.parse(eventFullDto.getPublishedOn()))
+                .publishedOn(LocalDateTime.parse(eventFullDto.getPublishedOn(), formatter))
                 .requestModeration(eventFullDto.isRequestModeration())
                 .state(eventFullDto.getState())
                 .title(eventFullDto.getTitle())
@@ -39,14 +40,14 @@ public class EventsMap {
                 .build();
     }
 
-    public static Event mapToEvent(NewEventDto newEventDto, Category category, User user){
+    public static Event mapToEvent(NewEventDto newEventDto, Category category, User user) {
         return Event.builder()
                 .annotation(newEventDto.getAnnotation())
                 .category(category)
                 .confirmedRequests(0)
                 .createdOn(LocalDateTime.now())
                 .description(newEventDto.getDescription())
-                .eventDate(LocalDateTime.parse(newEventDto.getEventDate()))
+                .eventDate(LocalDateTime.parse(newEventDto.getEventDate(), formatter))
                 .initiator(user)
                 .location(newEventDto.getLocation())
                 .paid(newEventDto.isPaid())
@@ -59,7 +60,7 @@ public class EventsMap {
                 .build();
     }
 
-    public static EventFullDto mapToEventFullDto(Event event){
+    public static EventFullDto mapToEventFullDto(Event event) {
         return EventFullDto.builder()
                 .annotation(event.getAnnotation())
                 .category(mapToCategoryDto(event.getCategory()))
@@ -79,16 +80,16 @@ public class EventsMap {
                 .build();
     }
 
-    public static List<EventFullDto> mapToListEventFullDto(List<Event> listEvent){
+    public static List<EventFullDto> mapToListEventFullDto(List<Event> listEvent) {
         List<EventFullDto> listEventFullDto = new ArrayList<>();
-        for(Event event : listEvent){
+        for (Event event : listEvent) {
             listEventFullDto.add(mapToEventFullDto(event));
         }
 
         return listEventFullDto;
     }
 
-    public static EventShortDto mapToEventShortDto(Event event){
+    public static EventShortDto mapToEventShortDto(Event event) {
         return EventShortDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -102,9 +103,9 @@ public class EventsMap {
                 .build();
     }
 
-    public static List<EventShortDto> mapToListEventShortDto(List<Event> listEvent){
+    public static List<EventShortDto> mapToListEventShortDto(List<Event> listEvent) {
         List<EventShortDto> listEventShortDto = new ArrayList<>();
-        for(Event event : listEvent){
+        for (Event event : listEvent) {
             listEventShortDto.add(mapToEventShortDto(event));
         }
         return listEventShortDto;

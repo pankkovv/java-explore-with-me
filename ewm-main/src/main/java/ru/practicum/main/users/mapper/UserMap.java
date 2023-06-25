@@ -5,6 +5,9 @@ import ru.practicum.main.users.dto.UserDto;
 import ru.practicum.main.users.dto.UserShortDto;
 import ru.practicum.main.users.model.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserMap {
     public static User mapToUser(UserDto userDto){
         return User.builder()
@@ -26,6 +29,14 @@ public class UserMap {
                 .name(user.getName())
                 .email(user.getEmail())
                 .build();
+    }
+
+    public static List<UserDto> mapToListUserDto(List<User> listUser){
+        List<UserDto> listUserDto = new ArrayList<>();
+        for(User user : listUser){
+            listUserDto.add(mapToUserDto(user));
+        }
+        return listUserDto;
     }
 
     public static UserShortDto mapToUserShortDto(User user){

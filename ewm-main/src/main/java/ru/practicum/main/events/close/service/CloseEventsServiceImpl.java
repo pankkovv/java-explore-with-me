@@ -12,6 +12,7 @@ import ru.practicum.main.events.dto.*;
 import ru.practicum.main.events.enums.EventStatus;
 import ru.practicum.main.events.model.Event;
 import ru.practicum.main.events.repository.EventsRepository;
+import ru.practicum.main.locat.service.LocationService;
 import ru.practicum.main.requests.close.service.CloseRequestsService;
 import ru.practicum.main.requests.dto.ParticipationRequestDto;
 import ru.practicum.main.users.model.User;
@@ -31,6 +32,8 @@ public class CloseEventsServiceImpl implements CloseEventsService {
     private EventsRepository repository;
     @Autowired
     private CloseRequestsService requestsService;
+    @Autowired
+    private LocationService locationService;
     @Override
     public List<EventShortDto> getEventsByUser(int userId, int from, int size) {
         Pageable page = paged(from, size);
@@ -39,10 +42,11 @@ public class CloseEventsServiceImpl implements CloseEventsService {
 
     @Override
     public EventFullDto createEvents(int userId, NewEventDto newEventDto) {
-        User user = new User();
-        Category category = new Category();
+        User user = User.builder().id(1).name("Allen Feeney").email("Layne_Bednar@gmail.com").build();
+        Category category = Category.builder().id(10).name("Fantastic0").build();
+        locationService.save(newEventDto.getLocation());
 
-        return mapToEventFullDto(repository.save(mapToEvent(newEventDto, category,user)));
+        return mapToEventFullDto(repository.save(mapToEvent(newEventDto, category, user)));
     }
 
     @Override
