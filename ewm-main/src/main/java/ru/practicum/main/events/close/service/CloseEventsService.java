@@ -1,7 +1,10 @@
 package ru.practicum.main.events.close.service;
 
-import ru.practicum.main.events.dto.*;
-import ru.practicum.main.requests.dto.ParticipationRequestDto;
+import ru.practicum.main.events.dto.EventFullDto;
+import ru.practicum.main.events.dto.EventShortDto;
+import ru.practicum.main.events.dto.NewEventDto;
+import ru.practicum.main.events.dto.UpdateEventUserRequest;
+import ru.practicum.main.events.model.Event;
 
 import java.util.List;
 
@@ -14,7 +17,6 @@ public interface CloseEventsService {
 
     EventFullDto changeEventsByUser(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest);
 
-    List<ParticipationRequestDto> getRequestsByUser(int userId, int eventId);
+    Event getEventById(int eventId);
 
-    EventRequestStatusUpdateResult changeStatusRequestsByUser(int userId, int eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
 }

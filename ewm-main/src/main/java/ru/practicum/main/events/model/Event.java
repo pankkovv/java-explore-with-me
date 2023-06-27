@@ -4,13 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import ru.practicum.main.categories.model.Category;
-import ru.practicum.main.locat.model.Location;
-import ru.practicum.main.events.enums.EventStatus;
+import ru.practicum.main.compilations.model.Compilations;
+import ru.practicum.main.locations.model.Location;
 import ru.practicum.main.users.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -24,6 +26,7 @@ public class Event {
     private int id;
     private String annotation;
     @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "category_id")
     private Category category;
     @Column(name = "confirmed_requests")
@@ -36,7 +39,8 @@ public class Event {
     @ManyToOne
     @JoinColumn(name = "initiator_id")
     private User initiator;
-    @OneToOne
+    @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.REPLICATE)
     @JoinColumn(name = "location_id")
     private Location location;
     private boolean paid;
@@ -50,4 +54,10 @@ public class Event {
     private EventStatus state;
     private String title;
     private int views;
+    @ManyToMany
+    @Cascade(org.hibernate.annotations.CascadeType.REPLICATE)
+    @JoinTable(name = "compilations_events",
+            joinColumns = @JoinColumn(name = "compilations_id"),
+            inverseJoinColumns = @JoinColumn(name = "events_id"))
+    private List<Compilations> compilations;
 }

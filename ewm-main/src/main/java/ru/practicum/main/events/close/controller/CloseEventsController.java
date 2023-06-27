@@ -3,15 +3,12 @@ package ru.practicum.main.events.close.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.main.events.close.service.CloseEventsService;
-import ru.practicum.main.events.dto.EventFullDto;
-import ru.practicum.main.events.dto.EventShortDto;
-import ru.practicum.main.events.dto.NewEventDto;
-import ru.practicum.main.events.dto.UpdateEventUserRequest;
-import ru.practicum.main.events.dto.EventRequestStatusUpdateRequest;
-import ru.practicum.main.events.dto.EventRequestStatusUpdateResult;
-import ru.practicum.main.requests.dto.ParticipationRequestDto;
+import ru.practicum.main.events.dto.*;
+import ru.practicum.main.requests.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.main.requests.dto.EventRequestStatusUpdateResult;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -23,6 +20,7 @@ import java.util.List;
 public class CloseEventsController {
     @Autowired
     private CloseEventsService service;
+
     @GetMapping(path = "/{userId}/events")
     public List<EventShortDto> getEventsByUser(@PathVariable(name = "userId") int userId,
                                                @RequestParam(name = "from", defaultValue = "0") int from,
@@ -30,6 +28,7 @@ public class CloseEventsController {
         return service.getEventsByUser(userId, from, size);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/{userId}/events")
     public EventFullDto createEvents(@PathVariable(name = "userId") int userId,
                                      @RequestBody @Valid NewEventDto newEventDto) {
@@ -47,18 +46,5 @@ public class CloseEventsController {
                                            @PathVariable(name = "eventId") int eventId,
                                            @RequestBody UpdateEventUserRequest updateEventUserRequest) {
         return service.changeEventsByUser(userId, eventId, updateEventUserRequest);
-    }
-
-    @GetMapping(path = "{userId}/events/{eventId}/requests")
-    public List<ParticipationRequestDto> getRequestsByUser(@PathVariable(name = "userId") int userId,
-                                                           @PathVariable(name = "eventId") int eventId) {
-        return service.getRequestsByUser(userId, eventId);
-    }
-
-    @PatchMapping(path = "{userId}/events/{eventId}/requests")
-    public EventRequestStatusUpdateResult changeStatusRequestsByUser(@PathVariable(name = "userId") int userId,
-                                                                     @PathVariable(name = "eventId") int eventId,
-                                                                     @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        return service.changeStatusRequestsByUser(userId, eventId, eventRequestStatusUpdateRequest);
     }
 }

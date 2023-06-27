@@ -8,13 +8,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.categories.model.Category;
-import ru.practicum.main.events.dto.*;
-import ru.practicum.main.events.enums.EventStatus;
+import ru.practicum.main.categories.open.service.OpenCategoriesService;
+import ru.practicum.main.events.dto.EventFullDto;
+import ru.practicum.main.events.dto.EventShortDto;
+import ru.practicum.main.events.dto.NewEventDto;
+import ru.practicum.main.events.dto.UpdateEventUserRequest;
 import ru.practicum.main.events.model.Event;
+import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.events.repository.EventsRepository;
-import ru.practicum.main.locat.service.LocationService;
-import ru.practicum.main.requests.close.service.CloseRequestsService;
-import ru.practicum.main.requests.dto.ParticipationRequestDto;
+import ru.practicum.main.locations.model.Location;
+import ru.practicum.main.locations.service.LocationService;
+import ru.practicum.main.users.admin.service.AdminUsersServiceImpl;
 import ru.practicum.main.users.model.User;
 
 import java.time.LocalDateTime;
@@ -31,9 +35,12 @@ public class CloseEventsServiceImpl implements CloseEventsService {
     @Autowired
     private EventsRepository repository;
     @Autowired
-    private CloseRequestsService requestsService;
-    @Autowired
     private LocationService locationService;
+    @Autowired
+    private AdminUsersServiceImpl usersService;
+    @Autowired
+    private OpenCategoriesService categoriesService;
+
     @Override
     public List<EventShortDto> getEventsByUser(int userId, int from, int size) {
         Pageable page = paged(from, size);
@@ -42,9 +49,9 @@ public class CloseEventsServiceImpl implements CloseEventsService {
 
     @Override
     public EventFullDto createEvents(int userId, NewEventDto newEventDto) {
-        User user = User.builder().id(1).name("Allen Feeney").email("Layne_Bednar@gmail.com").build();
-        Category category = Category.builder().id(10).name("Fantastic0").build();
-        locationService.save(newEventDto.getLocation());
+        User user = usersService.getUserById(userId);
+        Category category = categoriesService.getCatById(newEventDto.getCategory());
+        Location location = locationService.save(newEventDto.getLocation());
 
         return mapToEventFullDto(repository.save(mapToEvent(newEventDto, category, user)));
     }
@@ -56,35 +63,44 @@ public class CloseEventsServiceImpl implements CloseEventsService {
 
     @Override
     public EventFullDto changeEventsByUser(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest) {
-        User user = new User();
         Event event = repository.findById(eventId).orElseThrow();
 
-        if(event.getState().equals(EventStatus.REJECT_EVENT) || event.getState().equals(EventStatus.PENDING)){
-            if(updateEventUserRequest.getAnnotation() != null){
+        if (event.getState().equals(EventStatus.PENDING) || event.getState().equals(EventStatus.CANCELED)) {
+            if (updateEventUserRequest.getAnnotation() != null) {
                 event.setAnnotation(updateEventUserRequest.getAnnotation());
             }
-            if(updateEventUserRequest.getCategory() != null){
+            if (updateEventUserRequest.getCategory() != null) {
                 event.setCategory(mapToCategory(updateEventUserRequest.getCategory()));
             }
-            if(updateEventUserRequest.getDescription() != null){
+            if (updateEventUserRequest.getDescription() != null) {
                 event.setDescription(updateEventUserRequest.getDescription());
             }
-            if(updateEventUserRequest.getEventDate() != null){
+            if (updateEventUserRequest.getEventDate() != null) {
                 event.setEventDate(LocalDateTime.parse(updateEventUserRequest.getEventDate()));
             }
-            if(updateEventUserRequest.getLocation() != null){
+            if (updateEventUserRequest.getLocation() != null) {
                 event.setLocation(updateEventUserRequest.getLocation());
             }
-            if(updateEventUserRequest.isPaid()){
-                event.setPaid(updateEventUserRequest.isPaid());
+            if (updateEventUserRequest.getPaid() != null) {
+                event.setPaid(updateEventUserRequest.getPaid());
             }
-            if(updateEventUserRequest.getParticipantLimit() != (Integer) null){
+            if (updateEventUserRequest.getParticipantLimit() != null) {
                 event.setParticipantLimit(updateEventUserRequest.getParticipantLimit());
             }
-            if(updateEventUserRequest.getStateAction() != null){
-                event.setState(updateEventUserRequest.getStateAction());
+            if (updateEventUserRequest.getRequestModeration() != null) {
+                event.setRequestModeration(updateEventUserRequest.getRequestModeration());
             }
-            if(updateEventUserRequest.getTitle() != null){
+            if (updateEventUserRequest.getStateAction() != null) {
+                switch (updateEventUserRequest.getStateAction()) {
+                    case SEND_TO_REVIEW:
+                        event.setState(EventStatus.PUBLISHED);
+                        break;
+                    case CANCEL_REVIEW:
+                        event.setState(EventStatus.CANCELED);
+                        break;
+                }
+            }
+            if (updateEventUserRequest.getTitle() != null) {
                 event.setTitle(updateEventUserRequest.getTitle());
             }
 
@@ -95,14 +111,8 @@ public class CloseEventsServiceImpl implements CloseEventsService {
     }
 
     @Override
-    public List<ParticipationRequestDto> getRequestsByUser(int userId, int eventId) {
-        return requestsService.getRequestsByUserOtherEvents(userId);
-    }
-
-    @Override
-    public EventRequestStatusUpdateResult changeStatusRequestsByUser(int userId, int eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        Event event = repository.findById(eventId).orElseThrow();
-        return null;
+    public Event getEventById(int eventId) {
+        return repository.findById(eventId).orElseThrow();
     }
 
     private Pageable paged(Integer from, Integer size) {

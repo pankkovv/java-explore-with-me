@@ -4,8 +4,9 @@ import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.main.categories.dto.CategoryDto;
-import ru.practicum.main.events.enums.EventStatus;
-import ru.practicum.main.locat.model.Location;
+import ru.practicum.main.events.model.EventStatus;
+import ru.practicum.main.events.model.StateActionUser;
+import ru.practicum.main.locations.model.Location;
 
 @Data
 @Builder
@@ -17,10 +18,10 @@ public class UpdateEventUserRequest {
     private String description;
     private String eventDate;
     private Location location;
-    private boolean paid;
-    private int participantLimit;
-    private boolean requestModeration;
-    private EventStatus stateAction;
+    private Boolean paid;
+    private Integer participantLimit;
+    private Boolean requestModeration;
+    private StateActionUser stateAction;
     @Length(min = 3, max = 120)
     private String title;
 }

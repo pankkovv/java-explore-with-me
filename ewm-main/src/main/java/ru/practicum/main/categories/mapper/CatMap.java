@@ -8,22 +8,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CatMap {
-    public static Category mapToCategory(CategoryDto categoryDto){
+    public static Category mapToCategory(CategoryDto categoryDto) {
         return Category.builder()
+                .id(categoryDto.getId())
                 .name(categoryDto.getName())
+                .events(categoryDto.getEvents())
                 .build();
     }
 
-    public static CategoryDto mapToCategoryDto(Category category){
+    public static CategoryDto mapToCategoryDto(Category category) {
         return CategoryDto.builder()
                 .id(category.getId())
                 .name(category.getName())
                 .build();
     }
 
-    public static List<CategoryDto> mapToListCategoryDto(Page<Category> listCategory){
+    public static List<CategoryDto> mapToListCategoryDto(Page<Category> listCategory) {
         List<CategoryDto> listCategoryDto = new ArrayList<>();
-        for(Category cat : listCategory){
+        for (Category cat : listCategory) {
             listCategoryDto.add(mapToCategoryDto(cat));
         }
         return listCategoryDto;

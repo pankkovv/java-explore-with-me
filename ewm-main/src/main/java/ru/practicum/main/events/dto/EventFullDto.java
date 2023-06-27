@@ -3,8 +3,8 @@ package ru.practicum.main.events.dto;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.main.categories.dto.CategoryDto;
-import ru.practicum.main.events.enums.EventStatus;
-import ru.practicum.main.locat.model.Location;
+import ru.practicum.main.events.model.EventStatus;
+import ru.practicum.main.locations.model.Location;
 import ru.practicum.main.users.dto.UserShortDto;
 
 import javax.validation.constraints.NotBlank;
@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @Builder
 public class EventFullDto {
+    private int id;
     @NotBlank
     private String annotation;
     @NotNull
@@ -22,7 +23,6 @@ public class EventFullDto {
     private String description;
     @NotBlank
     private String eventDate;
-    private int id;
     @NotNull
     private UserShortDto initiator;
     @NotNull

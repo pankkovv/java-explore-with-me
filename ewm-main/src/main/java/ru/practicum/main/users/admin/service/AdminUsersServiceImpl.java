@@ -12,7 +12,6 @@ import ru.practicum.main.users.dto.UserDto;
 import ru.practicum.main.users.model.User;
 import ru.practicum.main.users.repository.UsersRepository;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,11 +24,12 @@ import static ru.practicum.main.users.mapper.UserMap.*;
 public class AdminUsersServiceImpl implements AdminUsersService {
     @Autowired
     private UsersRepository repository;
+
     @Override
     public List<UserDto> getUsers(List<Integer> ids, int from, int size) {
         Pageable page = paged(from, size);
         List<User> listUser = new ArrayList<>();
-        for(Integer id : ids){
+        for (Integer id : ids) {
             listUser.addAll(repository.findUsersById(id, page));
         }
         return mapToListUserDto(listUser);
@@ -43,6 +43,11 @@ public class AdminUsersServiceImpl implements AdminUsersService {
     @Override
     public void deleteUsers(int userId) {
         repository.deleteById(userId);
+    }
+
+    @Override
+    public User getUserById(int userId) {
+        return repository.findById(userId).orElseThrow();
     }
 
     private Pageable paged(Integer from, Integer size) {

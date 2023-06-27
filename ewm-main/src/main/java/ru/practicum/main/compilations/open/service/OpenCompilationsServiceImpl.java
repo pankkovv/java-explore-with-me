@@ -9,13 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.compilations.dto.CompilationDto;
 import ru.practicum.main.compilations.repository.CompilationsRepository;
-import ru.practicum.main.events.dto.EventFullDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static ru.practicum.main.compilations.mapper.CompMap.mapToCompilationDto;
-import static ru.practicum.main.compilations.mapper.CompMap.mapToListCompilationDto;
+import static ru.practicum.main.compilations.mapper.CompMap.mapToCompilationsDto;
+import static ru.practicum.main.compilations.mapper.CompMap.mapToListCompilationsDto;
 
 @Service
 @Transactional
@@ -24,17 +22,16 @@ import static ru.practicum.main.compilations.mapper.CompMap.mapToListCompilation
 public class OpenCompilationsServiceImpl implements OpenCompilationsService {
     @Autowired
     private CompilationsRepository repository;
+
     @Override
     public List<CompilationDto> getCompilations(boolean pinned, int from, int size) {
         Pageable page = paged(from, size);
-        List<EventFullDto> listEventFullDto = new ArrayList<>();
-        return mapToListCompilationDto(repository.findByPinnedContaining(pinned, page), listEventFullDto);
+        return mapToListCompilationsDto(repository.findCompilationsByPinnedIs(pinned, page));
     }
 
     @Override
     public CompilationDto getCompilationsById(int compId) {
-        List<EventFullDto> listEventFullDto = new ArrayList<>();
-        return mapToCompilationDto(repository.getById(compId), listEventFullDto);
+        return mapToCompilationsDto(repository.findById(compId).orElseThrow());
     }
 
     private Pageable paged(Integer from, Integer size) {

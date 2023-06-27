@@ -9,21 +9,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserMap {
-    public static User mapToUser(UserDto userDto){
+    public static User mapToUser(UserDto userDto) {
         return User.builder()
                 .name(userDto.getName())
                 .email(userDto.getEmail())
                 .build();
     }
 
-    public static User mapToUser(NewUserRequest userRequest){
+    public static User mapToUser(NewUserRequest userRequest) {
         return User.builder()
                 .name(userRequest.getName())
                 .email(userRequest.getEmail())
                 .build();
     }
 
-    public static UserDto mapToUserDto(User user){
+    public static UserDto mapToUserDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -31,15 +31,15 @@ public class UserMap {
                 .build();
     }
 
-    public static List<UserDto> mapToListUserDto(List<User> listUser){
+    public static List<UserDto> mapToListUserDto(List<User> listUser) {
         List<UserDto> listUserDto = new ArrayList<>();
-        for(User user : listUser){
+        for (User user : listUser) {
             listUserDto.add(mapToUserDto(user));
         }
         return listUserDto;
     }
 
-    public static UserShortDto mapToUserShortDto(User user){
+    public static UserShortDto mapToUserShortDto(User user) {
         return UserShortDto.builder()
                 .id(user.getId())
                 .name(user.getName())

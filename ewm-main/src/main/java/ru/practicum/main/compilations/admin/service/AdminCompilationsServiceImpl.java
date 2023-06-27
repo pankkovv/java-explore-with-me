@@ -8,16 +8,16 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.compilations.dto.CompilationDto;
 import ru.practicum.main.compilations.dto.NewCompilationDto;
 import ru.practicum.main.compilations.dto.UpdateCompilationRequest;
-import ru.practicum.main.compilations.model.Compilation;
+import ru.practicum.main.compilations.model.Compilations;
 import ru.practicum.main.compilations.repository.CompilationsRepository;
-import ru.practicum.main.events.dto.EventFullDto;
+import ru.practicum.main.events.close.service.CloseEventsService;
 import ru.practicum.main.events.model.Event;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.practicum.main.compilations.mapper.CompMap.mapToCompilationDto;
 import static ru.practicum.main.compilations.mapper.CompMap.mapToCompilations;
+import static ru.practicum.main.compilations.mapper.CompMap.mapToCompilationsDto;
 
 @Service
 @Transactional
@@ -25,36 +25,47 @@ import static ru.practicum.main.compilations.mapper.CompMap.mapToCompilations;
 @Slf4j
 public class AdminCompilationsServiceImpl implements AdminCompilationsService {
     @Autowired
-    CompilationsRepository repository;
+    CompilationsRepository compilationsRepository;
+    @Autowired
+    private CloseEventsService eventsService;
+
     @Override
     public CompilationDto createCompilations(NewCompilationDto newCompilationDto) {
-        Event event = new Event();
-        List<EventFullDto> listEventFullDto = new ArrayList<>();
-        Compilation compilation = mapToCompilations(newCompilationDto,event);
-        return mapToCompilationDto(repository.save(compilation), listEventFullDto);
+        List<Event> eventList = new ArrayList<>();
+
+        for (Integer eventId : newCompilationDto.getEvents()) {
+            eventList.add(eventsService.getEventById(eventId));
+        }
+
+        return mapToCompilationsDto(compilationsRepository.save(mapToCompilations(newCompilationDto, eventList)));
     }
 
     @Override
     public void deleteCompilations(int compId) {
-        repository.deleteById(compId);
+        compilationsRepository.deleteById(compId);
     }
 
     @Override
     public CompilationDto changeCompilations(int compId, UpdateCompilationRequest updateCompilationRequest) {
-        Compilation oldCompilation = repository.findById(compId).orElseThrow();
-        List<EventFullDto> listEventFullDto = new ArrayList<>();
+        Compilations oldCompilations = compilationsRepository.findById(compId).orElseThrow();
 
-        if(updateCompilationRequest.getEvents() != null && !updateCompilationRequest.getEvents().isEmpty()){
-            Event event = new Event();
-            oldCompilation.setEvents(event);
+        if (updateCompilationRequest.getEvents() != null && !updateCompilationRequest.getEvents().isEmpty()) {
+            List<Event> eventList = new ArrayList<>();
+
+            for (Integer eventId : updateCompilationRequest.getEvents()) {
+                eventList.add(eventsService.getEventById(eventId));
+            }
+
+            oldCompilations.setEvents(eventList);
         }
-        if(updateCompilationRequest.isPinned()){
-            oldCompilation.setPinned(updateCompilationRequest.isPinned());
+        if (updateCompilationRequest.getPinned() != null) {
+            oldCompilations.setPinned(updateCompilationRequest.getPinned());
         }
-        if(updateCompilationRequest.getTitle() != null && !updateCompilationRequest.getTitle().isEmpty()){
-            oldCompilation.setTitle(updateCompilationRequest.getTitle());
+        if (updateCompilationRequest.getTitle() != null && !updateCompilationRequest.getTitle().isEmpty()) {
+            oldCompilations.setTitle(updateCompilationRequest.getTitle());
         }
 
-        return mapToCompilationDto(oldCompilation, listEventFullDto);
+        return mapToCompilationsDto(compilationsRepository.save(oldCompilations));
     }
+
 }

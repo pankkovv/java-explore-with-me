@@ -3,8 +3,11 @@ package ru.practicum.main.requests.close.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.main.requests.close.service.CloseRequestsService;
+import ru.practicum.main.requests.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.main.requests.dto.EventRequestStatusUpdateResult;
 import ru.practicum.main.requests.dto.ParticipationRequestDto;
 
 import java.util.List;
@@ -22,9 +25,10 @@ public class CloseRequestsController {
         return service.getRequestsByUserOtherEvents(userId);
     }
 
-    @PostMapping(path = "{userId}/requests/{eventId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(path = "{userId}/requests")
     public ParticipationRequestDto createRequestsByUserOtherEvents(@PathVariable(name = "userId") int userId,
-                                                                   @PathVariable(name = "eventId") int eventId) {
+                                                                   @RequestParam(name = "eventId") int eventId) {
         return service.createRequestsByUserOtherEvents(userId, eventId);
     }
 
@@ -32,5 +36,18 @@ public class CloseRequestsController {
     public ParticipationRequestDto cancelRequestsByUserOtherEvents(@PathVariable(name = "userId") int userId,
                                                                    @PathVariable(name = "requestId") int requestId) {
         return service.cancelRequestsByUserOtherEvents(userId, requestId);
+    }
+
+    @GetMapping(path = "{userId}/events/{eventId}/requests")
+    public List<ParticipationRequestDto> getRequestsByUser(@PathVariable(name = "userId") int userId,
+                                                           @PathVariable(name = "eventId") int eventId) {
+        return service.getRequestsByUser(userId, eventId);
+    }
+
+    @PatchMapping(path = "{userId}/events/{eventId}/requests")
+    public EventRequestStatusUpdateResult changeStatusRequestsByUser(@PathVariable(name = "userId") int userId,
+                                                                     @PathVariable(name = "eventId") int eventId,
+                                                                     @RequestBody EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
+        return service.changeStatusRequestsByUser(userId, eventId, eventRequestStatusUpdateRequest);
     }
 }

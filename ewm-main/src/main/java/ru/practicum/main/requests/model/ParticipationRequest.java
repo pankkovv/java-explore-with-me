@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.main.events.enums.EventStatus;
+import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.events.model.Event;
 import ru.practicum.main.users.model.User;
 
@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "requests")
 public class ParticipationRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,5 +29,5 @@ public class ParticipationRequest {
     @JoinColumn(name = "requester_id")
     private User requester;
     @Enumerated(EnumType.STRING)
-    private EventStatus status;
+    private StatusEventRequestUpdateResult status;
 }

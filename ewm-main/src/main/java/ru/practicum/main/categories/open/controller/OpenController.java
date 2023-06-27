@@ -18,6 +18,7 @@ import java.util.List;
 public class OpenController {
     @Autowired
     private OpenCategoriesService service;
+
     @GetMapping(path = "/categories")
     public List<CategoryDto> getCategories(@RequestParam(name = "from", defaultValue = "0") int from,
                                            @RequestParam(name = "size", defaultValue = "10") int size) {

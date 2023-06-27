@@ -8,7 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.categories.dto.CategoryDto;
-import ru.practicum.main.categories.exception.NotFoundCategories;
+import ru.practicum.main.categories.model.Category;
+import ru.practicum.main.exception.NotFoundCategories;
 import ru.practicum.main.categories.repository.CategoriesRepository;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import static ru.practicum.main.categories.mapper.CatMap.mapToListCategoryDto;
 public class OpenCategoriesServiceImpl implements OpenCategoriesService {
     @Autowired
     private CategoriesRepository repository;
+
     @Override
     public List<CategoryDto> getCategories(int from, int size) {
         Pageable page = paged(from, size);
@@ -32,6 +34,11 @@ public class OpenCategoriesServiceImpl implements OpenCategoriesService {
     @Override
     public CategoryDto getCategoriesById(int catId) {
         return mapToCategoryDto(repository.findById(catId).orElseThrow(() -> new NotFoundCategories("")));
+    }
+
+    @Override
+    public Category getCatById(int catId) {
+        return repository.findById(catId).orElseThrow(() -> new NotFoundCategories(""));
     }
 
     private Pageable paged(Integer from, Integer size) {
