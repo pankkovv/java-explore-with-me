@@ -6,9 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.main.events.close.service.CloseEventsService;
-import ru.practicum.main.events.dto.*;
-import ru.practicum.main.requests.dto.EventRequestStatusUpdateRequest;
-import ru.practicum.main.requests.dto.EventRequestStatusUpdateResult;
+import ru.practicum.main.events.dto.EventFullDto;
+import ru.practicum.main.events.dto.EventShortDto;
+import ru.practicum.main.events.dto.NewEventDto;
+import ru.practicum.main.events.dto.UpdateEventUserRequest;
 
 import javax.validation.Valid;
 import java.util.List;

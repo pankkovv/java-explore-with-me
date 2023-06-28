@@ -29,10 +29,14 @@ public class AdminUsersServiceImpl implements AdminUsersService {
     public List<UserDto> getUsers(List<Integer> ids, int from, int size) {
         Pageable page = paged(from, size);
         List<User> listUser = new ArrayList<>();
-        for (Integer id : ids) {
-            listUser.addAll(repository.findUsersById(id, page));
+        if (ids != null && !ids.isEmpty()) {
+            for (Integer id : ids) {
+                listUser.addAll(repository.findUsersById(id, page));
+            }
+            return mapToListUserDto(listUser);
+        } else {
+            return mapToListUserDto(repository.findAll(page));
         }
-        return mapToListUserDto(listUser);
     }
 
     @Override

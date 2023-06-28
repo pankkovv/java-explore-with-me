@@ -2,6 +2,7 @@ package ru.practicum.main.categories.mapper;
 
 import org.springframework.data.domain.Page;
 import ru.practicum.main.categories.dto.CategoryDto;
+import ru.practicum.main.categories.dto.NewCategoryDto;
 import ru.practicum.main.categories.model.Category;
 
 import java.util.ArrayList;
@@ -10,9 +11,13 @@ import java.util.List;
 public class CatMap {
     public static Category mapToCategory(CategoryDto categoryDto) {
         return Category.builder()
-                .id(categoryDto.getId())
                 .name(categoryDto.getName())
-                .events(categoryDto.getEvents())
+                .build();
+    }
+
+    public static Category mapToCategory(NewCategoryDto newCategoryDto) {
+        return Category.builder()
+                .name(newCategoryDto.getName())
                 .build();
     }
 

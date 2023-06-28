@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.categories.dto.CategoryDto;
+import ru.practicum.main.categories.dto.NewCategoryDto;
 import ru.practicum.main.categories.model.Category;
 import ru.practicum.main.categories.repository.CategoriesRepository;
 
@@ -21,8 +22,8 @@ public class AdminCategoriesServiceImpl implements AdminCategoriesService {
     private CategoriesRepository repository;
 
     @Override
-    public CategoryDto createCategories(CategoryDto categoryDto) {
-        return mapToCategoryDto(repository.save(mapToCategory(categoryDto)));
+    public CategoryDto createCategories(NewCategoryDto newCategoryDto) {
+        return mapToCategoryDto(repository.save(mapToCategory(newCategoryDto)));
     }
 
     @Override
@@ -40,7 +41,7 @@ public class AdminCategoriesServiceImpl implements AdminCategoriesService {
     }
 
     @Override
-    public Category findCategoriesById(int catId){
+    public Category findCategoriesById(int catId) {
         return repository.findById(catId).orElseThrow();
     }
 }

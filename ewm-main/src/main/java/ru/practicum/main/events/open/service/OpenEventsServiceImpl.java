@@ -5,22 +5,23 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.events.dto.EventFullDto;
-import ru.practicum.main.events.dto.OpenEventRequests;
 import ru.practicum.main.events.dto.EventShortDto;
+import ru.practicum.main.events.dto.OpenEventRequests;
 import ru.practicum.main.events.model.Event;
-import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.events.model.QEvent;
 import ru.practicum.main.events.repository.EventsRepository;
+import ru.practicum.main.exception.NotFoundCategories;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.practicum.main.events.mapper.EventsMap.*;
+import static ru.practicum.main.events.mapper.EventsMap.mapToEventFullDto;
+import static ru.practicum.main.events.mapper.EventsMap.mapToListEventShortDto;
 
 @Service
 @Transactional
@@ -52,7 +53,7 @@ public class OpenEventsServiceImpl implements OpenEventsService {
         if (requests.getRangeStart() != null && requests.getRangeEnd() != null) {
             conditions.add(event.eventDate.between(requests.getRangeStart(), requests.getRangeEnd()));
         }
-//
+
 //        if (requests.getOnlyAvailable() != null) {
 //            conditions.add(event.state.eq(EventStatus.PUBLISHED));
 //        }
@@ -61,10 +62,19 @@ public class OpenEventsServiceImpl implements OpenEventsService {
                 .reduce(BooleanExpression::and)
                 .get();
 
-        Sort sort = makeOrderByClause(requests.getSort());
-        PageRequest pageRequest = PageRequest.of(requests.getFrom(), requests.getSize(), sort);
+        PageRequest pageRequest = PageRequest.of(requests.getFrom(), requests.getSize());
+
+        if(requests.getSort() != null){
+            Sort sort = makeOrderByClause(requests.getSort());
+            pageRequest = PageRequest.of(requests.getFrom(), requests.getSize(), sort);
+        }
 
         Page<Event> eventsPage = repository.findAll(finalCondition, pageRequest);
+
+        if(eventsPage.isEmpty()){
+            throw new NotFoundCategories("");
+        }
+
         return mapToListEventShortDto(eventsPage);
     }
 

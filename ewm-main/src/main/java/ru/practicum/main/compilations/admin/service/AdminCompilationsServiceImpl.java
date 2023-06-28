@@ -56,7 +56,7 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
                 eventList.add(eventsService.getEventById(eventId));
             }
 
-            oldCompilations.setEvents(eventList);
+            oldCompilations.setEventsWithCompilations(eventList);
         }
         if (updateCompilationRequest.getPinned() != null) {
             oldCompilations.setPinned(updateCompilationRequest.getPinned());

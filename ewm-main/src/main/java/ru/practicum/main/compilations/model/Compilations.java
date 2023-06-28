@@ -23,9 +23,9 @@ public class Compilations {
     private boolean pinned;
     private String title;
     @ManyToMany
-    @Cascade(org.hibernate.annotations.CascadeType.REPLICATE)
+    @Cascade({org.hibernate.annotations.CascadeType.PERSIST})
     @JoinTable(name = "compilations_events",
             joinColumns = @JoinColumn(name = "events_id"),
             inverseJoinColumns = @JoinColumn(name = "compilations_id"))
-    private List<Event> events;
+    private List<Event> eventsWithCompilations;
 }

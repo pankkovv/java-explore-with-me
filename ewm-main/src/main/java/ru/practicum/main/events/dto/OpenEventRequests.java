@@ -33,16 +33,28 @@ public class OpenEventRequests {
         OpenEventRequests request = new OpenEventRequests();
         request.setText(text);
         request.setPaid(paid);
-        request.setRangeStart(LocalDateTime.parse(rangeStart, formatter));
-        request.setRangeEnd(LocalDateTime.parse(rangeEnd, formatter));
+
+        if (rangeStart != null) {
+            request.setRangeStart(LocalDateTime.parse(rangeStart, formatter));
+        }
+
+        if (rangeEnd != null) {
+            request.setRangeEnd(LocalDateTime.parse(rangeEnd, formatter));
+        }
+
         request.setOnlyAvailable(onlyAvailable);
-        request.setSort(Sort.valueOf(sort.toUpperCase()));
+
+        if (sort != null) {
+            request.setSort(Sort.valueOf(sort.toUpperCase()));
+        }
+
         request.setFrom(from);
         request.setSize(size);
 
         if (categories != null) {
             request.setCategories(categories);
         }
+
         return request;
     }
 

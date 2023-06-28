@@ -7,8 +7,6 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.main.events.model.Event;
 
-import java.util.List;
-
 @Repository
 public interface EventsRepository extends JpaRepository<Event, Integer>, QuerydslPredicateExecutor<Event> {
     Page<Event> findEventsByInitiator_Id(int userId, Pageable page);

@@ -12,12 +12,12 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class NewEventDto {
     @NotBlank
-    @Length(min = 20, max = 2000)
+    @Length(min = 19, max = 2001)
     private String annotation;
     @NotNull
     private int category;
     @NotBlank
-    @Length(min = 20, max = 7000)
+    @Length(min = 19, max = 7001)
     private String description;
     @NotBlank
     private String eventDate;
@@ -30,6 +30,6 @@ public class NewEventDto {
     @Builder.Default
     private boolean requestModeration = true;
     @NotBlank
-    @Length(min = 3, max = 120)
+    @Length(min = 2, max = 121)
     private String title;
 }

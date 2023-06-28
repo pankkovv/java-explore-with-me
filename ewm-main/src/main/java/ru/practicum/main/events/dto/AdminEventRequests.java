@@ -28,8 +28,13 @@ public class AdminEventRequests {
                                         Integer from,
                                         Integer size) {
         AdminEventRequests request = new AdminEventRequests();
-        request.setRangeStart(LocalDateTime.parse(rangeStart, formatter));
-        request.setRangeEnd(LocalDateTime.parse(rangeEnd, formatter));
+        if (rangeStart != null) {
+            request.setRangeStart(LocalDateTime.parse(rangeStart, formatter));
+
+        }
+        if (rangeEnd != null) {
+            request.setRangeEnd(LocalDateTime.parse(rangeEnd, formatter));
+        }
         request.setFrom(from);
         request.setSize(size);
 

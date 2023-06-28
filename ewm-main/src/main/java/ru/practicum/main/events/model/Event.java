@@ -8,6 +8,7 @@ import org.hibernate.annotations.Cascade;
 import ru.practicum.main.categories.model.Category;
 import ru.practicum.main.compilations.model.Compilations;
 import ru.practicum.main.locations.model.Location;
+import ru.practicum.main.requests.model.ParticipationRequest;
 import ru.practicum.main.users.model.User;
 
 import javax.persistence.*;
@@ -55,9 +56,11 @@ public class Event {
     private String title;
     private int views;
     @ManyToMany
-    @Cascade(org.hibernate.annotations.CascadeType.REPLICATE)
+    @Cascade({org.hibernate.annotations.CascadeType.MERGE})
     @JoinTable(name = "compilations_events",
             joinColumns = @JoinColumn(name = "compilations_id"),
             inverseJoinColumns = @JoinColumn(name = "events_id"))
     private List<Compilations> compilations;
+    @OneToMany(mappedBy = "eventsWithRequests", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<ParticipationRequest> requests;
 }

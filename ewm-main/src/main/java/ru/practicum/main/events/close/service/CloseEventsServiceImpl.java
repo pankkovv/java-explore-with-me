@@ -16,12 +16,13 @@ import ru.practicum.main.events.dto.UpdateEventUserRequest;
 import ru.practicum.main.events.model.Event;
 import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.events.repository.EventsRepository;
-import ru.practicum.main.locations.model.Location;
 import ru.practicum.main.locations.service.LocationService;
 import ru.practicum.main.users.admin.service.AdminUsersServiceImpl;
 import ru.practicum.main.users.model.User;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static ru.practicum.main.categories.mapper.CatMap.mapToCategory;
@@ -49,9 +50,11 @@ public class CloseEventsServiceImpl implements CloseEventsService {
 
     @Override
     public EventFullDto createEvents(int userId, NewEventDto newEventDto) {
+        validTime(newEventDto.getEventDate());
+
         User user = usersService.getUserById(userId);
         Category category = categoriesService.getCatById(newEventDto.getCategory());
-        Location location = locationService.save(newEventDto.getLocation());
+        locationService.save(newEventDto.getLocation());
 
         return mapToEventFullDto(repository.save(mapToEvent(newEventDto, category, user)));
     }
@@ -66,6 +69,10 @@ public class CloseEventsServiceImpl implements CloseEventsService {
         Event event = repository.findById(eventId).orElseThrow();
 
         if (event.getState().equals(EventStatus.PENDING) || event.getState().equals(EventStatus.CANCELED)) {
+            if (updateEventUserRequest.getEventDate() != null) {
+                validTime(updateEventUserRequest.getEventDate());
+                event.setEventDate(LocalDateTime.parse(updateEventUserRequest.getEventDate()));
+            }
             if (updateEventUserRequest.getAnnotation() != null) {
                 event.setAnnotation(updateEventUserRequest.getAnnotation());
             }
@@ -74,9 +81,6 @@ public class CloseEventsServiceImpl implements CloseEventsService {
             }
             if (updateEventUserRequest.getDescription() != null) {
                 event.setDescription(updateEventUserRequest.getDescription());
-            }
-            if (updateEventUserRequest.getEventDate() != null) {
-                event.setEventDate(LocalDateTime.parse(updateEventUserRequest.getEventDate()));
             }
             if (updateEventUserRequest.getLocation() != null) {
                 event.setLocation(updateEventUserRequest.getLocation());
@@ -93,7 +97,7 @@ public class CloseEventsServiceImpl implements CloseEventsService {
             if (updateEventUserRequest.getStateAction() != null) {
                 switch (updateEventUserRequest.getStateAction()) {
                     case SEND_TO_REVIEW:
-                        event.setState(EventStatus.PUBLISHED);
+                        event.setState(EventStatus.PENDING);
                         break;
                     case CANCEL_REVIEW:
                         event.setState(EventStatus.CANCELED);
@@ -113,6 +117,15 @@ public class CloseEventsServiceImpl implements CloseEventsService {
     @Override
     public Event getEventById(int eventId) {
         return repository.findById(eventId).orElseThrow();
+    }
+
+    private void validTime(String time) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime startDate = LocalDateTime.parse(time, formatter);
+
+        if (Duration.between(LocalDateTime.now(), startDate).toMinutes() < Duration.ofHours(2).toMinutes()) {
+            throw new RuntimeException();
+        }
     }
 
     private Pageable paged(Integer from, Integer size) {

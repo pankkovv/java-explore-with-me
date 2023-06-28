@@ -21,5 +21,5 @@ public class Category {
     private int id;
     private String name;
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Event> events;
+    private List<Event> eventsWithCategories;
 }

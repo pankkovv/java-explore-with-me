@@ -1,5 +1,6 @@
 package ru.practicum.main.users.mapper;
 
+import org.springframework.data.domain.Page;
 import ru.practicum.main.users.dto.NewUserRequest;
 import ru.practicum.main.users.dto.UserDto;
 import ru.practicum.main.users.dto.UserShortDto;
@@ -29,6 +30,14 @@ public class UserMap {
                 .name(user.getName())
                 .email(user.getEmail())
                 .build();
+    }
+
+    public static List<UserDto> mapToListUserDto(Page<User> listUser) {
+        List<UserDto> listUserDto = new ArrayList<>();
+        for (User user : listUser) {
+            listUserDto.add(mapToUserDto(user));
+        }
+        return listUserDto;
     }
 
     public static List<UserDto> mapToListUserDto(List<User> listUser) {

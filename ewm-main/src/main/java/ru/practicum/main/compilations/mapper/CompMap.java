@@ -13,7 +13,7 @@ import static ru.practicum.main.events.mapper.EventsMap.mapToListEventFullDto;
 public class CompMap {
     public static Compilations mapToCompilations(NewCompilationDto newCompilationDto, List<Event> eventList) {
         return Compilations.builder()
-                .events(eventList)
+                .eventsWithCompilations(eventList)
                 .pinned(newCompilationDto.isPinned())
                 .title(newCompilationDto.getTitle())
                 .build();
@@ -22,7 +22,7 @@ public class CompMap {
     public static CompilationDto mapToCompilationsDto(Compilations compilations) {
         return CompilationDto.builder()
                 .id(compilations.getId())
-                .events(mapToListEventFullDto(compilations.getEvents()))
+                .events(mapToListEventFullDto(compilations.getEventsWithCompilations()))
                 .pinned(compilations.isPinned())
                 .title(compilations.getTitle())
                 .build();

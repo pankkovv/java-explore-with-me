@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 import ru.practicum.main.categories.dto.CategoryDto;
-import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.events.model.StateActionUser;
 import ru.practicum.main.locations.model.Location;
 

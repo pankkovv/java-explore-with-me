@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.main.events.model.EventStatus;
+import org.hibernate.annotations.Cascade;
 import ru.practicum.main.events.model.Event;
 import ru.practicum.main.users.model.User;
 
@@ -23,8 +23,9 @@ public class ParticipationRequest {
     private int id;
     private LocalDateTime created;
     @ManyToOne
+    @Cascade(org.hibernate.annotations.CascadeType.REPLICATE)
     @JoinColumn(name = "event_id")
-    private Event event;
+    private Event eventsWithRequests;
     @ManyToOne
     @JoinColumn(name = "requester_id")
     private User requester;

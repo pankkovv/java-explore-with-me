@@ -14,5 +14,6 @@ public interface CloseRequestsService {
     ParticipationRequestDto cancelRequestsByUserOtherEvents(int userId, int requestId);
 
     List<ParticipationRequestDto> getRequestsByUser(int userId, int eventId);
+
     EventRequestStatusUpdateResult changeStatusRequestsByUser(int userId, int eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
 }

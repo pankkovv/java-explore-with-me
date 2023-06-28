@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.main.categories.admin.service.AdminCategoriesService;
 import ru.practicum.main.categories.dto.CategoryDto;
+import ru.practicum.main.categories.dto.NewCategoryDto;
 
 import javax.validation.Valid;
 
@@ -20,8 +21,8 @@ public class AdminCategoriesController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/categories")
-    public CategoryDto createCategories(@RequestBody @Valid CategoryDto categoryDto) {
-        return service.createCategories(categoryDto);
+    public CategoryDto createCategories(@RequestBody @Valid NewCategoryDto newCategoryDto) {
+        return service.createCategories(newCategoryDto);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

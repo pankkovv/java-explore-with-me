@@ -18,5 +18,4 @@ public interface CloseEventsService {
     EventFullDto changeEventsByUser(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest);
 
     Event getEventById(int eventId);
-
 }

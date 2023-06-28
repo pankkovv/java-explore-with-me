@@ -20,6 +20,7 @@ import ru.practicum.main.events.repository.EventsRepository;
 import ru.practicum.main.locations.model.Location;
 import ru.practicum.main.locations.service.LocationService;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -67,13 +68,20 @@ public class AdminEventsServiceImpl implements AdminEventsService {
             conditions.add(event.eventDate.between(requests.getRangeStart(), requests.getRangeEnd()));
         }
 
-        BooleanExpression finalCondition = conditions.stream()
-                .reduce(BooleanExpression::and)
-                .get();
-
         PageRequest pageRequest = PageRequest.of(requests.getFrom(), requests.getSize());
+        Page<Event> eventsPage;
 
-        Page<Event> eventsPage = repository.findAll(finalCondition, pageRequest);
+        if (!conditions.isEmpty()) {
+            BooleanExpression finalCondition = conditions.stream()
+                    .reduce(BooleanExpression::and)
+                    .get();
+
+            eventsPage = repository.findAll(finalCondition, pageRequest);
+        } else {
+            eventsPage = repository.findAll(pageRequest);
+        }
+
+
         return mapToListEventFullDto(eventsPage);
     }
 
@@ -93,6 +101,13 @@ public class AdminEventsServiceImpl implements AdminEventsService {
             event.setDescription(updateEventAdminRequest.getDescription());
         }
         if (updateEventAdminRequest.getEventDate() != null) {
+            LocalDateTime startOldDate = event.getCreatedOn();
+            LocalDateTime startNewDate = LocalDateTime.parse(updateEventAdminRequest.getEventDate(), formatter);
+
+            if (Duration.between(startOldDate, startNewDate).toMinutes() < Duration.ofHours(1).toMinutes()) {
+                throw new RuntimeException();
+            }
+
             event.setEventDate(LocalDateTime.parse(updateEventAdminRequest.getEventDate(), formatter));
         }
         if (updateEventAdminRequest.getLocation() != null) {
@@ -108,16 +123,22 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         if (updateEventAdminRequest.getRequestModeration() != null) {
             event.setRequestModeration(updateEventAdminRequest.getRequestModeration());
         }
-        if (updateEventAdminRequest.getStateAction() != null) {
-            switch (updateEventAdminRequest.getStateAction()) {
-                case PUBLISH_EVENT:
-                    event.setState(EventStatus.PUBLISHED);
-                    break;
-                case REJECT_EVENT:
-                    event.setState(EventStatus.CANCELED);
-                    break;
+
+        if (event.getState().equals(EventStatus.PENDING)) {
+            if (updateEventAdminRequest.getStateAction() != null) {
+                switch (updateEventAdminRequest.getStateAction()) {
+                    case PUBLISH_EVENT:
+                        event.setState(EventStatus.PUBLISHED);
+                        break;
+                    case REJECT_EVENT:
+                        event.setState(EventStatus.CANCELED);
+                        break;
+                }
             }
+        } else {
+            throw new RuntimeException();
         }
+
         if (updateEventAdminRequest.getTitle() != null) {
             event.setTitle(updateEventAdminRequest.getTitle());
         }

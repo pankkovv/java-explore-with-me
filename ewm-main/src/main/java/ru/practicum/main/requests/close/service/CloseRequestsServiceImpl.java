@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.events.close.service.CloseEventsService;
+import ru.practicum.main.events.model.Event;
+import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.requests.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.main.requests.dto.EventRequestStatusUpdateResult;
-import ru.practicum.main.events.model.EventStatus;
-import ru.practicum.main.events.model.Event;
 import ru.practicum.main.requests.dto.ParticipationRequestDto;
 import ru.practicum.main.requests.model.ParticipationRequest;
 import ru.practicum.main.requests.model.StatusEventRequestUpdateResult;
@@ -44,18 +44,30 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
         User user = usersService.getUserById(userId);
         Event event = eventsService.getEventById(eventId);
 
-        if (event.getInitiator() != user) {
-            ParticipationRequest request = ParticipationRequest.builder()
-                    .created(LocalDateTime.now())
-                    .event(event)
-                    .requester(user)
-                    .status(StatusEventRequestUpdateResult.PENDING)
-                    .build();
-            return mapToParticipationRequestDto(repository.save(request));
-        } else {
+        boolean conditionOne = !getRequestsByUser(userId, eventId).isEmpty();
+        boolean conditionTwo = event.getInitiator() == user;
+        boolean conditionThree = event.getState().equals(EventStatus.PENDING) || event.getState().equals(EventStatus.CANCELED);
+        boolean conditionFour = event.getConfirmedRequests() >= event.getParticipantLimit();
+        boolean conditionFive = !event.isRequestModeration();
+
+        if (conditionOne && conditionTwo && conditionThree && conditionFour) {
             throw new RuntimeException();
         }
 
+        ParticipationRequest request = ParticipationRequest.builder()
+                .created(LocalDateTime.now())
+                .eventsWithRequests(event)
+                .requester(user)
+                .build();
+
+        if (conditionFive) {
+            request.setStatus(StatusEventRequestUpdateResult.CONFIRMED);
+            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+        } else {
+            request.setStatus(StatusEventRequestUpdateResult.PENDING);
+        }
+
+        return mapToParticipationRequestDto(repository.save(request));
     }
 
     @Override
@@ -67,7 +79,7 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
 
     @Override
     public List<ParticipationRequestDto> getRequestsByUser(int userId, int eventId) {
-        return mapToListParticipationRequestDto(repository.findParticipationRequestsByRequester_IdAndEvent_Id(userId, eventId));
+        return mapToListParticipationRequestDto(repository.findParticipationRequestsByRequester_IdAndEventsWithRequests_Id(userId, eventId));
     }
 
     @Override
@@ -75,11 +87,29 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
         List<ParticipationRequest> requestList = repository.findParticipationRequestsByRequester_Id(userId);
 
         for (ParticipationRequest request : requestList) {
-            if (request.getEvent().getId() == eventId) {
-                request.setStatus(eventRequestStatusUpdateRequest.getStatus());
+            if (request.getEventsWithRequests().getId() == eventId) {
+
+                boolean conditionOne = (request.getEventsWithRequests().getParticipantLimit() == 0) || !request.getEventsWithRequests().isRequestModeration();
+                boolean conditionTwo = request.getEventsWithRequests().getConfirmedRequests() >= request.getEventsWithRequests().getParticipantLimit();
+                boolean conditionThree = request.getStatus().equals(StatusEventRequestUpdateResult.PENDING);
+
+                if (conditionOne) {
+                    request.setStatus(StatusEventRequestUpdateResult.CONFIRMED);
+                    request.getEventsWithRequests().setConfirmedRequests(request.getEventsWithRequests().getConfirmedRequests() + 1);
+                }
+
+                if (conditionTwo) {
+                    request.setStatus(StatusEventRequestUpdateResult.CANCELED);
+                }
+
+                if (conditionThree) {
+                    request.setStatus(eventRequestStatusUpdateRequest.getStatus());
+                    if (request.getStatus().equals(StatusEventRequestUpdateResult.CONFIRMED)) {
+                        request.getEventsWithRequests().setConfirmedRequests(request.getEventsWithRequests().getConfirmedRequests() + 1);
+                    }
+                }
             }
         }
-
         return mapToEventRequestStatusUpdateResult(requestList);
     }
 }

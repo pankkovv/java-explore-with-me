@@ -3,12 +3,14 @@ package ru.practicum.main.events.dto;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.main.categories.dto.CategoryDto;
+import ru.practicum.main.compilations.model.Compilations;
 import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.locations.model.Location;
 import ru.practicum.main.users.dto.UserShortDto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @Builder

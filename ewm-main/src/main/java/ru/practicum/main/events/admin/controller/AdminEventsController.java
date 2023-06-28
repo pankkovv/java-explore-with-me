@@ -9,6 +9,7 @@ import ru.practicum.main.events.dto.AdminEventRequests;
 import ru.practicum.main.events.dto.EventFullDto;
 import ru.practicum.main.events.dto.UpdateEventAdminRequest;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -32,7 +33,7 @@ public class AdminEventsController {
 
     @PatchMapping(path = "/events/{eventId}")
     public EventFullDto changeEvents(@PathVariable(name = "eventId") int eventId,
-                                     @RequestBody UpdateEventAdminRequest updateEventAdminRequest) {
+                                     @RequestBody @Valid UpdateEventAdminRequest updateEventAdminRequest) {
         return service.changeEvents(eventId, updateEventAdminRequest);
     }
 }

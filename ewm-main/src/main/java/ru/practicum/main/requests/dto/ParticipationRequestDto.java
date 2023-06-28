@@ -2,7 +2,6 @@ package ru.practicum.main.requests.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.requests.model.StatusEventRequestUpdateResult;
 
 @Data

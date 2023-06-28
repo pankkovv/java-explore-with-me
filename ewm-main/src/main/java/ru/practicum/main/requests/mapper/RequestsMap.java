@@ -18,7 +18,7 @@ public class RequestsMap {
     public static ParticipationRequest mapToParticipationRequest(ParticipationRequestDto participationRequestDto, Event event, User user) {
         return ParticipationRequest.builder()
                 .created(LocalDateTime.parse(participationRequestDto.getCreated(), formatter))
-                .event(event)
+                .eventsWithRequests(event)
                 .requester(user)
                 .status(participationRequestDto.getStatus())
                 .build();
@@ -28,7 +28,7 @@ public class RequestsMap {
         return ParticipationRequestDto.builder()
                 .id(participationRequest.getId())
                 .created(participationRequest.getCreated().toString().replace("T", " "))
-                .event(participationRequest.getEvent().getId())
+                .event(participationRequest.getEventsWithRequests().getId())
                 .requester(participationRequest.getRequester().getId())
                 .status(participationRequest.getStatus())
                 .build();
