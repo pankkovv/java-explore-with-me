@@ -8,7 +8,7 @@ import ru.practicum.main.events.model.Event;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ru.practicum.main.events.mapper.EventsMap.mapToListEventFullDto;
+import static ru.practicum.main.events.mapper.EventsMap.mapToListEventShortDto;
 
 public class CompMap {
     public static Compilations mapToCompilations(NewCompilationDto newCompilationDto, List<Event> eventList) {
@@ -22,7 +22,7 @@ public class CompMap {
     public static CompilationDto mapToCompilationsDto(Compilations compilations) {
         return CompilationDto.builder()
                 .id(compilations.getId())
-                .events(mapToListEventFullDto(compilations.getEventsWithCompilations()))
+                .events(mapToListEventShortDto(compilations.getEventsWithCompilations()))
                 .pinned(compilations.isPinned())
                 .title(compilations.getTitle())
                 .build();

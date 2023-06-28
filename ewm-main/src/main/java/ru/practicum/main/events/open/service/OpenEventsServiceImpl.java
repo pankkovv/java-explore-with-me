@@ -54,9 +54,9 @@ public class OpenEventsServiceImpl implements OpenEventsService {
             conditions.add(event.eventDate.between(requests.getRangeStart(), requests.getRangeEnd()));
         }
 
-//        if (requests.getOnlyAvailable() != null) {
-//            conditions.add(event.state.eq(EventStatus.PUBLISHED));
-//        }
+        if (requests.getOnlyAvailable() != null) {
+            conditions.add(event.confirmedRequests.in(event.participantLimit));
+        }
 
         BooleanExpression finalCondition = conditions.stream()
                 .reduce(BooleanExpression::and)
@@ -64,14 +64,14 @@ public class OpenEventsServiceImpl implements OpenEventsService {
 
         PageRequest pageRequest = PageRequest.of(requests.getFrom(), requests.getSize());
 
-        if(requests.getSort() != null){
+        if (requests.getSort() != null) {
             Sort sort = makeOrderByClause(requests.getSort());
             pageRequest = PageRequest.of(requests.getFrom(), requests.getSize(), sort);
         }
 
         Page<Event> eventsPage = repository.findAll(finalCondition, pageRequest);
 
-        if(eventsPage.isEmpty()){
+        if (eventsPage.isEmpty()) {
             throw new NotFoundCategories("");
         }
 

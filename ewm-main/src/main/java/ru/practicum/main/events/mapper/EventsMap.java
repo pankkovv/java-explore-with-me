@@ -121,4 +121,12 @@ public class EventsMap {
         }
         return listEventShortDto;
     }
+
+    public static List<EventShortDto> mapToListEventShortDto(List<Event> listEvent) {
+        List<EventShortDto> listEventShortDto = new ArrayList<>();
+        for (Event event : listEvent) {
+            listEventShortDto.add(mapToEventShortDto(event));
+        }
+        return listEventShortDto;
+    }
 }
