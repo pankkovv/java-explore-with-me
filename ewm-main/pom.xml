@@ -67,16 +67,16 @@
         </dependency>
 
         <dependency>
-            <groupId>ru.practicum.main.stats</groupId>
-            <artifactId>ewm-stats-dto</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
             <version>5.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.practicum.main.stats</groupId>
+            <artifactId>ewm-stats-client</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

@@ -17,6 +17,8 @@ import ru.practicum.main.events.model.Event;
 import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.events.model.QEvent;
 import ru.practicum.main.events.repository.EventsRepository;
+import ru.practicum.main.exception.ConflictException;
+import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.locations.model.Location;
 import ru.practicum.main.locations.service.LocationService;
 
@@ -87,7 +89,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
 
     @Override
     public EventFullDto changeEvents(int eventId, UpdateEventAdminRequest updateEventAdminRequest) {
-        Event event = repository.findById(eventId).orElseThrow();
+        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие не найдено или недоступно."));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         if (updateEventAdminRequest.getAnnotation() != null) {
@@ -105,7 +107,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
             LocalDateTime startNewDate = LocalDateTime.parse(updateEventAdminRequest.getEventDate(), formatter);
 
             if (Duration.between(startOldDate, startNewDate).toMinutes() < Duration.ofHours(1).toMinutes()) {
-                throw new RuntimeException();
+                throw new ConflictException("Событие не удовлетворяет правилам редактирования.");
             }
 
             event.setEventDate(LocalDateTime.parse(updateEventAdminRequest.getEventDate(), formatter));
@@ -136,7 +138,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
                 }
             }
         } else {
-            throw new RuntimeException();
+            throw new ConflictException("Событие не удовлетворяет правилам редактирования.");
         }
 
         if (updateEventAdminRequest.getTitle() != null) {

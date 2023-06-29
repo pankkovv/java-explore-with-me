@@ -4,15 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 import ru.practicum.main.categories.model.Category;
-import ru.practicum.main.compilations.model.Compilations;
 import ru.practicum.main.locations.model.Location;
 import ru.practicum.main.users.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Builder

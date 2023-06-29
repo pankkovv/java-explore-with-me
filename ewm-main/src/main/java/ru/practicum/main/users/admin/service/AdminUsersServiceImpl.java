@@ -7,12 +7,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.users.dto.NewUserRequest;
 import ru.practicum.main.users.dto.UserDto;
 import ru.practicum.main.users.model.User;
 import ru.practicum.main.users.repository.UsersRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static ru.practicum.main.users.mapper.UserMap.*;
@@ -28,12 +28,8 @@ public class AdminUsersServiceImpl implements AdminUsersService {
     @Override
     public List<UserDto> getUsers(List<Integer> ids, int from, int size) {
         Pageable page = paged(from, size);
-        List<User> listUser = new ArrayList<>();
         if (ids != null && !ids.isEmpty()) {
-            for (Integer id : ids) {
-                listUser.addAll(repository.findUsersById(id, page));
-            }
-            return mapToListUserDto(listUser);
+            return mapToListUserDto(repository.findAllById(ids));
         } else {
             return mapToListUserDto(repository.findAll(page));
         }
@@ -46,12 +42,13 @@ public class AdminUsersServiceImpl implements AdminUsersService {
 
     @Override
     public void deleteUsers(int userId) {
+        repository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден или недоступен"));
         repository.deleteById(userId);
     }
 
     @Override
     public User getUserById(int userId) {
-        return repository.findById(userId).orElseThrow();
+        return repository.findById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден."));
     }
 
     private Pageable paged(Integer from, Integer size) {

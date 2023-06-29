@@ -12,6 +12,7 @@ import ru.practicum.main.compilations.model.Compilations;
 import ru.practicum.main.compilations.repository.CompilationsRepository;
 import ru.practicum.main.events.close.service.CloseEventsService;
 import ru.practicum.main.events.model.Event;
+import ru.practicum.main.exception.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +43,13 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
 
     @Override
     public void deleteCompilations(int compId) {
+        compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException("Подборка не найдена или недоступна."));
         compilationsRepository.deleteById(compId);
     }
 
     @Override
     public CompilationDto changeCompilations(int compId, UpdateCompilationRequest updateCompilationRequest) {
-        Compilations oldCompilations = compilationsRepository.findById(compId).orElseThrow();
+        Compilations oldCompilations = compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException("Подборка не найдена или недоступна."));
 
         if (updateCompilationRequest.getEvents() != null && !updateCompilationRequest.getEvents().isEmpty()) {
             List<Event> eventList = new ArrayList<>();

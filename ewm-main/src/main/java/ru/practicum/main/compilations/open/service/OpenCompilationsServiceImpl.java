@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.compilations.dto.CompilationDto;
 import ru.practicum.main.compilations.repository.CompilationsRepository;
+import ru.practicum.main.exception.NotFoundException;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class OpenCompilationsServiceImpl implements OpenCompilationsService {
 
     @Override
     public CompilationDto getCompilationsById(int compId) {
-        return mapToCompilationsDto(repository.findCompilationsById(compId));
+        return mapToCompilationsDto(repository.findById(compId).orElseThrow(() -> new NotFoundException("Подборка не найдена или недоступна.")));
     }
 
     private Pageable paged(Integer from, Integer size) {

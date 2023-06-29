@@ -9,6 +9,7 @@ import ru.practicum.main.categories.dto.CategoryDto;
 import ru.practicum.main.categories.dto.NewCategoryDto;
 import ru.practicum.main.categories.model.Category;
 import ru.practicum.main.categories.repository.CategoriesRepository;
+import ru.practicum.main.exception.NotFoundException;
 
 import static ru.practicum.main.categories.mapper.CatMap.mapToCategory;
 import static ru.practicum.main.categories.mapper.CatMap.mapToCategoryDto;
@@ -28,6 +29,7 @@ public class AdminCategoriesServiceImpl implements AdminCategoriesService {
 
     @Override
     public void deleteCategories(int catId) {
+        repository.findById(catId).orElseThrow(() -> new NotFoundException("Категория не найдена или недоступна"));
         repository.deleteById(catId);
     }
 
@@ -42,6 +44,6 @@ public class AdminCategoriesServiceImpl implements AdminCategoriesService {
 
     @Override
     public Category findCategoriesById(int catId) {
-        return repository.findById(catId).orElseThrow();
+        return repository.findById(catId).orElseThrow(() -> new NotFoundException("Категория не найдена."));
     }
 }

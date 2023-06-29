@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.main.events.close.service.CloseEventsService;
 import ru.practicum.main.events.model.Event;
 import ru.practicum.main.events.model.EventStatus;
+import ru.practicum.main.exception.ConflictException;
+import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.requests.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.main.requests.dto.EventRequestStatusUpdateResult;
 import ru.practicum.main.requests.dto.ParticipationRequestDto;
@@ -36,6 +38,7 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
 
     @Override
     public List<ParticipationRequestDto> getRequestsByUserOtherEvents(int userId) {
+        usersService.getUserById(userId);
         return mapToListParticipationRequestDto(repository.findParticipationRequestsByRequester_Id(userId));
     }
 
@@ -61,8 +64,8 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
         boolean conditionFour = event.getConfirmedRequests() >= event.getParticipantLimit();
         boolean conditionFive = !event.isRequestModeration();
 
-        if (conditionOne && conditionTwo && conditionThree && conditionFour) {
-            throw new RuntimeException();
+        if (conditionOne || conditionTwo || conditionThree || conditionFour) {
+            throw new ConflictException("Нарушение целостности данных.");
         }
 
         ParticipationRequest request = ParticipationRequest.builder()
@@ -83,7 +86,7 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
 
     @Override
     public ParticipationRequestDto cancelRequestsByUserOtherEvents(int userId, int requestId) {
-        ParticipationRequest request = repository.findParticipationRequestByIdAndRequester_Id(requestId, userId);
+        ParticipationRequest request = repository.findParticipationRequestByIdAndRequester_Id(requestId, userId).orElseThrow(() -> new NotFoundException("Запрос не найден или недоступен."));
         request.setStatus(StatusEventRequestUpdateResult.CANCELED);
         return mapToParticipationRequestDto(repository.save(request));
     }
@@ -96,6 +99,10 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
     @Override
     public EventRequestStatusUpdateResult changeStatusRequestsByUser(int userId, int eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         List<ParticipationRequest> requestList = repository.findParticipationRequestsByEventsWithRequests_IdAndEventsWithRequests_Initiator_Id(eventId, userId);
+
+        if (requestList.isEmpty()){
+            throw new NotFoundException("Событие не найдено или недоступно.");
+        }
 
         for (ParticipationRequest request : requestList) {
 
@@ -110,6 +117,7 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
 
             if (conditionTwo) {
                 request.setStatus(StatusEventRequestUpdateResult.CANCELED);
+                throw new ConflictException("Достигнут лимит одобренных заявок.");
             }
 
             if (conditionThree) {

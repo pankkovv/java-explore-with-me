@@ -5,7 +5,7 @@ public enum ExceptionStatus {
     SWITCHING_PROTOCOLS("101"),
     PROCESSING("102"),
     CHECKPOINT("103"),
-    OK("2002"),
+    OK("202"),
     CREATED("201"),
     ACCEPTED("202"),
     NON_AUTHORITATIVE_INFORMATION("203"),

@@ -16,6 +16,8 @@ import ru.practicum.main.events.dto.UpdateEventUserRequest;
 import ru.practicum.main.events.model.Event;
 import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.events.repository.EventsRepository;
+import ru.practicum.main.exception.ConflictException;
+import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.locations.service.LocationService;
 import ru.practicum.main.users.admin.service.AdminUsersServiceImpl;
 import ru.practicum.main.users.model.User;
@@ -61,12 +63,12 @@ public class CloseEventsServiceImpl implements CloseEventsService {
 
     @Override
     public EventFullDto getEventsByUserFullInfo(int userId, int eventId) {
-        return mapToEventFullDto(repository.findEventByIdAndInitiator_Id(eventId, userId));
+        return mapToEventFullDto(repository.findEventByIdAndInitiator_Id(eventId, userId).orElseThrow(() -> new NotFoundException("Событие не найдено или недоступно.")));
     }
 
     @Override
     public EventFullDto changeEventsByUser(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest) {
-        Event event = repository.findById(eventId).orElseThrow();
+        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие не найдено или недоступно."));
 
         if (event.getState().equals(EventStatus.PENDING) || event.getState().equals(EventStatus.CANCELED)) {
             if (updateEventUserRequest.getEventDate() != null) {
@@ -110,13 +112,13 @@ public class CloseEventsServiceImpl implements CloseEventsService {
 
             return mapToEventFullDto(repository.save(event));
         } else {
-            throw new RuntimeException();
+            throw new ConflictException("Событие не удовлетворяет правилам редактирования.");
         }
     }
 
     @Override
     public Event getEventById(int eventId) {
-        return repository.findById(eventId).orElseThrow();
+        return repository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие не найдено или недоступно."));
     }
 
     private void validTime(String time) {
@@ -124,7 +126,7 @@ public class CloseEventsServiceImpl implements CloseEventsService {
         LocalDateTime startDate = LocalDateTime.parse(time, formatter);
 
         if (Duration.between(LocalDateTime.now(), startDate).toMinutes() < Duration.ofHours(2).toMinutes()) {
-            throw new RuntimeException();
+            throw new ConflictException("Событие не удовлетворяет правилам редактирования.");
         }
     }
 

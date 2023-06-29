@@ -10,12 +10,13 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.main.stats.client.BaseClient;
 import ru.practicum.main.stats.dto.RequestDto;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class StatsClient extends BaseClient {
     @Autowired
-    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatsClient(@Value("${stats-server.url:http://localhost:9090}") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
@@ -30,7 +31,7 @@ public class StatsClient extends BaseClient {
 
     public ResponseEntity<Object> stats(String start,
                                         String end,
-                                        String[] uris,
+                                        List<String> uris,
                                         boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
