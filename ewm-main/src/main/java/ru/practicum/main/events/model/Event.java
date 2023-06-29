@@ -39,7 +39,6 @@ public class Event {
     @JoinColumn(name = "initiator_id")
     private User initiator;
     @ManyToOne
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
     @JoinColumn(name = "location_id")
     private Location location;
     private boolean paid;
@@ -53,10 +52,4 @@ public class Event {
     private EventStatus state;
     private String title;
     private int views;
-    @ManyToMany
-    @Cascade(org.hibernate.annotations.CascadeType.MERGE)
-    @JoinTable(name = "compilations_events",
-            joinColumns = @JoinColumn(name = "compilations_id"),
-            inverseJoinColumns = @JoinColumn(name = "events_id"))
-    private List<Compilations> compilations;
 }

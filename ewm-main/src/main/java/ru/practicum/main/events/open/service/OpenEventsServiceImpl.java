@@ -54,22 +54,27 @@ public class OpenEventsServiceImpl implements OpenEventsService {
             conditions.add(event.eventDate.between(requests.getRangeStart(), requests.getRangeEnd()));
         }
 
-        if (requests.getOnlyAvailable() != null) {
-            conditions.add(event.confirmedRequests.in(event.participantLimit));
-        }
-
-        BooleanExpression finalCondition = conditions.stream()
-                .reduce(BooleanExpression::and)
-                .get();
+//        if (requests.getOnlyAvailable() != null) {
+//            conditions.add(event.confirmedRequests.in(event.participantLimit));
+//        }
 
         PageRequest pageRequest = PageRequest.of(requests.getFrom(), requests.getSize());
+        Page<Event> eventsPage;
 
         if (requests.getSort() != null) {
             Sort sort = makeOrderByClause(requests.getSort());
             pageRequest = PageRequest.of(requests.getFrom(), requests.getSize(), sort);
         }
 
-        Page<Event> eventsPage = repository.findAll(finalCondition, pageRequest);
+        if (!conditions.isEmpty()) {
+            BooleanExpression finalCondition = conditions.stream()
+                    .reduce(BooleanExpression::and)
+                    .get();
+
+            eventsPage = repository.findAll(finalCondition, pageRequest);
+        } else {
+            eventsPage = repository.findAll(pageRequest);
+        }
 
         if (eventsPage.isEmpty()) {
             throw new NotFoundCategories("");

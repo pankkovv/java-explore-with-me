@@ -23,7 +23,6 @@ public class ParticipationRequest {
     private int id;
     private LocalDateTime created;
     @ManyToOne
-    @Cascade(org.hibernate.annotations.CascadeType.REPLICATE)
     @JoinColumn(name = "event_id")
     private Event eventsWithRequests;
     @ManyToOne

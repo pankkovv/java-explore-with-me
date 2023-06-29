@@ -72,7 +72,5 @@ CREATE TABLE IF NOT EXISTS compilations
 CREATE TABLE IF NOT EXISTS compilations_events
 (
     compilations_id INT NOT NULL,
-    events_id       INT NOT NULL,
-    CONSTRAINT fk_supportive_compilation FOREIGN KEY (compilations_id) references compilations (id),
-    CONSTRAINT fk_events FOREIGN KEY (events_id) REFERENCES events (id)
+    events_id       INT NOT NULL
 );

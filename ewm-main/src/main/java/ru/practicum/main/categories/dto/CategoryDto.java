@@ -19,5 +19,4 @@ public class CategoryDto {
     @NotBlank
     @Length(min = 1, max = 50)
     private String name;
-    List<Event> events;
 }

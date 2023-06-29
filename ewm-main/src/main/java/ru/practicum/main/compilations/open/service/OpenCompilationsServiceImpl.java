@@ -31,7 +31,7 @@ public class OpenCompilationsServiceImpl implements OpenCompilationsService {
 
     @Override
     public CompilationDto getCompilationsById(int compId) {
-        return mapToCompilationsDto(repository.findById(compId).orElseThrow());
+        return mapToCompilationsDto(repository.findCompilationsById(compId));
     }
 
     private Pageable paged(Integer from, Integer size) {

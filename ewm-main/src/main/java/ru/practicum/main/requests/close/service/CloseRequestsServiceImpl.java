@@ -43,9 +43,20 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
     public ParticipationRequestDto createRequestsByUserOtherEvents(int userId, int eventId) {
         User user = usersService.getUserById(userId);
         Event event = eventsService.getEventById(eventId);
+        List<ParticipationRequestDto> requestDtoList = getRequestsByUserOtherEvents(userId);
 
-        boolean conditionOne = !getRequestsByUser(userId, eventId).isEmpty();
-        boolean conditionTwo = event.getInitiator() == user;
+        boolean conditionOne = false;
+
+        if (requestDtoList != null && !requestDtoList.isEmpty()) {
+            for (ParticipationRequestDto requestDto : requestDtoList) {
+                if (requestDto.getEvent() == eventId) {
+                    conditionOne = true;
+                    break;
+                }
+            }
+        }
+
+        boolean conditionTwo = event.getInitiator().getId() == user.getId();
         boolean conditionThree = event.getState().equals(EventStatus.PENDING) || event.getState().equals(EventStatus.CANCELED);
         boolean conditionFour = event.getConfirmedRequests() >= event.getParticipantLimit();
         boolean conditionFive = !event.isRequestModeration();
@@ -79,12 +90,12 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
 
     @Override
     public List<ParticipationRequestDto> getRequestsByUser(int userId, int eventId) {
-        return mapToListParticipationRequestDto(repository.findParticipationRequestsByRequester_IdAndEventsWithRequests_Id(userId, eventId));
+        return mapToListParticipationRequestDto(repository.findParticipationRequestsByEventsWithRequests_IdAndEventsWithRequests_Initiator_Id(eventId, userId));
     }
 
     @Override
     public EventRequestStatusUpdateResult changeStatusRequestsByUser(int userId, int eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
-        List<ParticipationRequest> requestList = repository.findParticipationRequestsByRequester_Id(userId);
+        List<ParticipationRequest> requestList = repository.findParticipationRequestsByEventsWithRequests_IdAndEventsWithRequests_Initiator_Id(eventId, userId);
 
         for (ParticipationRequest request : requestList) {
             if (request.getEventsWithRequests().getId() == eventId) {
