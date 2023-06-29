@@ -98,26 +98,24 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
         List<ParticipationRequest> requestList = repository.findParticipationRequestsByEventsWithRequests_IdAndEventsWithRequests_Initiator_Id(eventId, userId);
 
         for (ParticipationRequest request : requestList) {
-            if (request.getEventsWithRequests().getId() == eventId) {
 
-                boolean conditionOne = (request.getEventsWithRequests().getParticipantLimit() == 0) || !request.getEventsWithRequests().isRequestModeration();
-                boolean conditionTwo = request.getEventsWithRequests().getConfirmedRequests() >= request.getEventsWithRequests().getParticipantLimit();
-                boolean conditionThree = request.getStatus().equals(StatusEventRequestUpdateResult.PENDING);
+            boolean conditionOne = (request.getEventsWithRequests().getParticipantLimit() == 0) || !request.getEventsWithRequests().isRequestModeration();
+            boolean conditionTwo = request.getEventsWithRequests().getConfirmedRequests() >= request.getEventsWithRequests().getParticipantLimit();
+            boolean conditionThree = request.getStatus().equals(StatusEventRequestUpdateResult.PENDING);
 
-                if (conditionOne) {
-                    request.setStatus(StatusEventRequestUpdateResult.CONFIRMED);
+            if (conditionOne) {
+                request.setStatus(StatusEventRequestUpdateResult.CONFIRMED);
+                request.getEventsWithRequests().setConfirmedRequests(request.getEventsWithRequests().getConfirmedRequests() + 1);
+            }
+
+            if (conditionTwo) {
+                request.setStatus(StatusEventRequestUpdateResult.CANCELED);
+            }
+
+            if (conditionThree) {
+                request.setStatus(eventRequestStatusUpdateRequest.getStatus());
+                if (request.getStatus().equals(StatusEventRequestUpdateResult.CONFIRMED)) {
                     request.getEventsWithRequests().setConfirmedRequests(request.getEventsWithRequests().getConfirmedRequests() + 1);
-                }
-
-                if (conditionTwo) {
-                    request.setStatus(StatusEventRequestUpdateResult.CANCELED);
-                }
-
-                if (conditionThree) {
-                    request.setStatus(eventRequestStatusUpdateRequest.getStatus());
-                    if (request.getStatus().equals(StatusEventRequestUpdateResult.CONFIRMED)) {
-                        request.getEventsWithRequests().setConfirmedRequests(request.getEventsWithRequests().getConfirmedRequests() + 1);
-                    }
                 }
             }
         }
