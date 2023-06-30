@@ -8,6 +8,7 @@ import ru.practicum.main.events.admin.service.AdminEventsService;
 import ru.practicum.main.events.dto.AdminEventRequests;
 import ru.practicum.main.events.dto.EventFullDto;
 import ru.practicum.main.events.dto.UpdateEventAdminRequest;
+import ru.practicum.main.messages.LogMessages;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -28,12 +29,14 @@ public class AdminEventsController {
                                          @RequestParam(name = "rangeEnd", required = false) String rangeEnd,
                                          @RequestParam(name = "from", defaultValue = "0") int from,
                                          @RequestParam(name = "size", defaultValue = "10") int size) {
+        log.debug(LogMessages.TRY_ADMIN_GET_EVENT.label);
         return service.findEvents(AdminEventRequests.of(users, states, categories, rangeStart, rangeEnd, from, size));
     }
 
     @PatchMapping(path = "/events/{eventId}")
     public EventFullDto changeEvents(@PathVariable(name = "eventId") int eventId,
                                      @RequestBody @Valid UpdateEventAdminRequest updateEventAdminRequest) {
+        log.debug(LogMessages.TRY_ADMIN_PATCH_EVENT_ID.label, eventId);
         return service.changeEvents(eventId, updateEventAdminRequest);
     }
 }

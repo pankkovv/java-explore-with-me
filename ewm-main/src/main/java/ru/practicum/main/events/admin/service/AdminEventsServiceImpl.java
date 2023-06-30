@@ -19,8 +19,11 @@ import ru.practicum.main.events.model.QEvent;
 import ru.practicum.main.events.repository.EventsRepository;
 import ru.practicum.main.exception.ConflictException;
 import ru.practicum.main.exception.NotFoundException;
+import ru.practicum.main.exception.ValidTimeException;
 import ru.practicum.main.locations.model.Location;
 import ru.practicum.main.locations.service.LocationService;
+import ru.practicum.main.messages.ExceptionMessages;
+import ru.practicum.main.messages.LogMessages;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -43,6 +46,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
     @Autowired
     private LocationService locationService;
 
+    @Transactional(readOnly = true)
     @Override
     public List<EventFullDto> findEvents(AdminEventRequests requests) {
         QEvent event = QEvent.event;
@@ -83,13 +87,14 @@ public class AdminEventsServiceImpl implements AdminEventsService {
             eventsPage = repository.findAll(pageRequest);
         }
 
-
+        log.debug(LogMessages.ADMIN_GET_EVENT.label);
         return mapToListEventFullDto(eventsPage);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public EventFullDto changeEvents(int eventId, UpdateEventAdminRequest updateEventAdminRequest) {
-        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие не найдено или недоступно."));
+        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         if (updateEventAdminRequest.getAnnotation() != null) {
@@ -107,7 +112,7 @@ public class AdminEventsServiceImpl implements AdminEventsService {
             LocalDateTime startNewDate = LocalDateTime.parse(updateEventAdminRequest.getEventDate(), formatter);
 
             if (Duration.between(startOldDate, startNewDate).toMinutes() < Duration.ofHours(1).toMinutes()) {
-                throw new ConflictException("Событие не удовлетворяет правилам редактирования.");
+                throw new ValidTimeException(ExceptionMessages.VALID_TIME_EXCEPTION.label);
             }
 
             event.setEventDate(LocalDateTime.parse(updateEventAdminRequest.getEventDate(), formatter));
@@ -138,13 +143,14 @@ public class AdminEventsServiceImpl implements AdminEventsService {
                 }
             }
         } else {
-            throw new ConflictException("Событие не удовлетворяет правилам редактирования.");
+            throw new ConflictException(ExceptionMessages.CONFLICT_EXCEPTION.label);
         }
 
         if (updateEventAdminRequest.getTitle() != null) {
             event.setTitle(updateEventAdminRequest.getTitle());
         }
 
+        log.debug(LogMessages.ADMIN_PATCH_EVENT_ID.label, eventId);
         return mapToEventFullDto(repository.save(event));
     }
 }

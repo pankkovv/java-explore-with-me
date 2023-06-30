@@ -5,7 +5,7 @@ import ru.practicum.main.compilations.dto.CompilationDto;
 import java.util.List;
 
 public interface OpenCompilationsService {
-    List<CompilationDto> getCompilations(boolean pinned, int from, int size);
+    List<CompilationDto> getCompilations(String pinned, int from, int size);
 
     CompilationDto getCompilationsById(int compId);
 }

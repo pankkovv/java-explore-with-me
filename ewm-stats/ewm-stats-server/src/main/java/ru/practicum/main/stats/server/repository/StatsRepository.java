@@ -23,7 +23,7 @@ public interface StatsRepository extends JpaRepository<Stats, Long> {
 
     @Query("select new ru.practicum.main.stats.dto.ResponseDto(s.app, s.uri, count(s.app))" +
             "from Stats as s " +
-            "where s.uri like ?3 " +
+            "where s.uri like concat(?3, '%') " +
             "and s.timestamp between ?1 and ?2 " +
             "group by s.app, s.uri " +
             "order by count(s.app) desc ")

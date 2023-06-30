@@ -29,11 +29,9 @@ public class EventFullDto {
     private Location location;
     @NotNull
     private boolean paid;
-    @Builder.Default
-    private int participantLimit = 0;
+    private int participantLimit;
     private String publishedOn;
-    @Builder.Default
-    private boolean requestModeration = true;
+    private boolean requestModeration;
     private EventStatus state;
     @NotBlank
     private String title;

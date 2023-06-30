@@ -18,7 +18,10 @@ import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.events.repository.EventsRepository;
 import ru.practicum.main.exception.ConflictException;
 import ru.practicum.main.exception.NotFoundException;
+import ru.practicum.main.exception.ValidTimeException;
 import ru.practicum.main.locations.service.LocationService;
+import ru.practicum.main.messages.ExceptionMessages;
+import ru.practicum.main.messages.LogMessages;
 import ru.practicum.main.users.admin.service.AdminUsersServiceImpl;
 import ru.practicum.main.users.model.User;
 
@@ -44,6 +47,7 @@ public class CloseEventsServiceImpl implements CloseEventsService {
     @Autowired
     private OpenCategoriesService categoriesService;
 
+    @Transactional(readOnly = true)
     @Override
     public List<EventShortDto> getEventsByUser(int userId, int from, int size) {
         Pageable page = paged(from, size);
@@ -58,17 +62,20 @@ public class CloseEventsServiceImpl implements CloseEventsService {
         Category category = categoriesService.getCatById(newEventDto.getCategory());
         locationService.save(newEventDto.getLocation());
 
+        log.debug(LogMessages.PRIVATE_POST_EVENT_USER_ID.label, userId);
         return mapToEventFullDto(repository.save(mapToEvent(newEventDto, category, user)));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public EventFullDto getEventsByUserFullInfo(int userId, int eventId) {
-        return mapToEventFullDto(repository.findEventByIdAndInitiator_Id(eventId, userId).orElseThrow(() -> new NotFoundException("Событие не найдено или недоступно.")));
+        log.debug(LogMessages.PRIVATE_GET_EVENT_USER.label, userId);
+        return mapToEventFullDto(repository.findEventByIdAndInitiator_Id(eventId, userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label)));
     }
 
     @Override
     public EventFullDto changeEventsByUser(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest) {
-        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие не найдено или недоступно."));
+        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
 
         if (event.getState().equals(EventStatus.PENDING) || event.getState().equals(EventStatus.CANCELED)) {
             if (updateEventUserRequest.getEventDate() != null) {
@@ -110,15 +117,17 @@ public class CloseEventsServiceImpl implements CloseEventsService {
                 event.setTitle(updateEventUserRequest.getTitle());
             }
 
+            log.debug(LogMessages.PRIVATE_PATCH_EVENT_ID.label, eventId);
             return mapToEventFullDto(repository.save(event));
         } else {
-            throw new ConflictException("Событие не удовлетворяет правилам редактирования.");
+            throw new ConflictException(ExceptionMessages.CONFLICT_EXCEPTION.label);
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Event getEventById(int eventId) {
-        return repository.findById(eventId).orElseThrow(() -> new NotFoundException("Событие не найдено или недоступно."));
+        return repository.findById(eventId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
     }
 
     private void validTime(String time) {
@@ -126,7 +135,7 @@ public class CloseEventsServiceImpl implements CloseEventsService {
         LocalDateTime startDate = LocalDateTime.parse(time, formatter);
 
         if (Duration.between(LocalDateTime.now(), startDate).toMinutes() < Duration.ofHours(2).toMinutes()) {
-            throw new ConflictException("Событие не удовлетворяет правилам редактирования.");
+            throw new ValidTimeException(ExceptionMessages.VALID_TIME_EXCEPTION.label);
         }
     }
 

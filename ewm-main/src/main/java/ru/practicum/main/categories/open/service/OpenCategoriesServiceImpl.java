@@ -11,6 +11,8 @@ import ru.practicum.main.categories.dto.CategoryDto;
 import ru.practicum.main.categories.model.Category;
 import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.categories.repository.CategoriesRepository;
+import ru.practicum.main.messages.ExceptionMessages;
+import ru.practicum.main.messages.LogMessages;
 
 import java.util.List;
 
@@ -25,20 +27,27 @@ public class OpenCategoriesServiceImpl implements OpenCategoriesService {
     @Autowired
     private CategoriesRepository repository;
 
+    @Transactional(readOnly = true)
     @Override
     public List<CategoryDto> getCategories(int from, int size) {
         Pageable page = paged(from, size);
+        log.debug(LogMessages.PUBLIC_GET_CATEGORIES.label);
         return mapToListCategoryDto(repository.findAll(page));
     }
 
+    @Transactional(readOnly = true)
+
     @Override
     public CategoryDto getCategoriesById(int catId) {
-        return mapToCategoryDto(repository.findById(catId).orElseThrow(() -> new NotFoundException("Категория не найдена или недоступна.")));
+        log.debug(LogMessages.PUBLIC_GET_CATEGORIES_ID.label, catId);
+        return mapToCategoryDto(repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label)));
     }
+
+    @Transactional(readOnly = true)
 
     @Override
     public Category getCatById(int catId) {
-        return repository.findById(catId).orElseThrow(() -> new NotFoundException("Категория не найдена или недоступна."));
+        return repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
     }
 
     private Pageable paged(Integer from, Integer size) {

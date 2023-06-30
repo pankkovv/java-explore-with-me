@@ -10,6 +10,8 @@ import ru.practicum.main.events.model.Event;
 import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.exception.ConflictException;
 import ru.practicum.main.exception.NotFoundException;
+import ru.practicum.main.messages.ExceptionMessages;
+import ru.practicum.main.messages.LogMessages;
 import ru.practicum.main.requests.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.main.requests.dto.EventRequestStatusUpdateResult;
 import ru.practicum.main.requests.dto.ParticipationRequestDto;
@@ -36,9 +38,12 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
     @Autowired
     private CloseEventsService eventsService;
 
+    @Transactional(readOnly = true)
     @Override
     public List<ParticipationRequestDto> getRequestsByUserOtherEvents(int userId) {
         usersService.getUserById(userId);
+
+        log.debug(LogMessages.PRIVATE_GET_REQUESTS_USER_ID.label, userId);
         return mapToListParticipationRequestDto(repository.findParticipationRequestsByRequester_Id(userId));
     }
 
@@ -61,11 +66,12 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
 
         boolean conditionTwo = event.getInitiator().getId() == user.getId();
         boolean conditionThree = event.getState().equals(EventStatus.PENDING) || event.getState().equals(EventStatus.CANCELED);
-        boolean conditionFour = event.getConfirmedRequests() >= event.getParticipantLimit();
+        boolean conditionFour = (event.getConfirmedRequests() >= event.getParticipantLimit()) && event.getParticipantLimit() != 0;
         boolean conditionFive = !event.isRequestModeration();
+        boolean conditionSix = event.getParticipantLimit() == 0;
 
         if (conditionOne || conditionTwo || conditionThree || conditionFour) {
-            throw new ConflictException("Нарушение целостности данных.");
+            throw new ConflictException(ExceptionMessages.CONFLICT_EXCEPTION.label);
         }
 
         ParticipationRequest request = ParticipationRequest.builder()
@@ -74,25 +80,30 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
                 .requester(user)
                 .build();
 
-        if (conditionFive) {
+        if (conditionFive || conditionSix) {
             request.setStatus(StatusEventRequestUpdateResult.CONFIRMED);
             event.setConfirmedRequests(event.getConfirmedRequests() + 1);
         } else {
             request.setStatus(StatusEventRequestUpdateResult.PENDING);
         }
 
+        log.debug(LogMessages.PRIVATE_POST_REQUESTS_USER_ID.label, userId);
         return mapToParticipationRequestDto(repository.save(request));
     }
 
     @Override
     public ParticipationRequestDto cancelRequestsByUserOtherEvents(int userId, int requestId) {
-        ParticipationRequest request = repository.findParticipationRequestByIdAndRequester_Id(requestId, userId).orElseThrow(() -> new NotFoundException("Запрос не найден или недоступен."));
+        ParticipationRequest request = repository.findParticipationRequestByIdAndRequester_Id(requestId, userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
         request.setStatus(StatusEventRequestUpdateResult.CANCELED);
+
+        log.debug(LogMessages.PRIVATE_PATCH_REQUESTS_USER_ID.label, userId);
         return mapToParticipationRequestDto(repository.save(request));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ParticipationRequestDto> getRequestsByUser(int userId, int eventId) {
+        log.debug(LogMessages.PRIVATE_GET_REQUESTS_EVENT_ID.label, eventId);
         return mapToListParticipationRequestDto(repository.findParticipationRequestsByEventsWithRequests_IdAndEventsWithRequests_Initiator_Id(eventId, userId));
     }
 
@@ -100,8 +111,8 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
     public EventRequestStatusUpdateResult changeStatusRequestsByUser(int userId, int eventId, EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest) {
         List<ParticipationRequest> requestList = repository.findParticipationRequestsByEventsWithRequests_IdAndEventsWithRequests_Initiator_Id(eventId, userId);
 
-        if (requestList.isEmpty()){
-            throw new NotFoundException("Событие не найдено или недоступно.");
+        if (requestList.isEmpty()) {
+            throw new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label);
         }
 
         for (ParticipationRequest request : requestList) {
@@ -113,20 +124,26 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
             if (conditionOne) {
                 request.setStatus(StatusEventRequestUpdateResult.CONFIRMED);
                 request.getEventsWithRequests().setConfirmedRequests(request.getEventsWithRequests().getConfirmedRequests() + 1);
-            }
-
-            if (conditionTwo) {
-                request.setStatus(StatusEventRequestUpdateResult.CANCELED);
-                throw new ConflictException("Достигнут лимит одобренных заявок.");
+                repository.save(request);
             }
 
             if (conditionThree) {
-                request.setStatus(eventRequestStatusUpdateRequest.getStatus());
-                if (request.getStatus().equals(StatusEventRequestUpdateResult.CONFIRMED)) {
-                    request.getEventsWithRequests().setConfirmedRequests(request.getEventsWithRequests().getConfirmedRequests() + 1);
+                if (conditionTwo) {
+                    request.setStatus(StatusEventRequestUpdateResult.REJECTED);
+                    repository.save(request);
+                } else {
+                    request.setStatus(eventRequestStatusUpdateRequest.getStatus());
+                    if (request.getStatus().equals(StatusEventRequestUpdateResult.CONFIRMED)) {
+                        request.getEventsWithRequests().setConfirmedRequests(request.getEventsWithRequests().getConfirmedRequests() + 1);
+                    }
+                    repository.save(request);
                 }
+            } else {
+                throw new ConflictException(ExceptionMessages.CONFLICT_EXCEPTION.label);
             }
         }
+
+        log.debug(LogMessages.PRIVATE_PATCH_REQUESTS_STATUS_EVENT_ID.label, eventId);
         return mapToEventRequestStatusUpdateResult(requestList);
     }
 }

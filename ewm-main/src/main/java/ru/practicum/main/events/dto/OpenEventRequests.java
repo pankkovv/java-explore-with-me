@@ -23,16 +23,18 @@ public class OpenEventRequests {
 
     public static OpenEventRequests of(String text,
                                        List<Integer> categories,
-                                       boolean paid,
+                                       String paid,
                                        String rangeStart,
                                        String rangeEnd,
-                                       boolean onlyAvailable,
+                                       String onlyAvailable,
                                        String sort,
                                        Integer from,
                                        Integer size) {
         OpenEventRequests request = new OpenEventRequests();
         request.setText(text);
-        request.setPaid(paid);
+        if (paid != null) {
+            request.setPaid(Boolean.parseBoolean(paid));
+        }
 
         if (rangeStart != null) {
             request.setRangeStart(LocalDateTime.parse(rangeStart, formatter));
@@ -42,7 +44,9 @@ public class OpenEventRequests {
             request.setRangeEnd(LocalDateTime.parse(rangeEnd, formatter));
         }
 
-        request.setOnlyAvailable(onlyAvailable);
+        if (onlyAvailable != null) {
+            request.setOnlyAvailable(Boolean.parseBoolean(onlyAvailable));
+        }
 
         if (sort != null) {
             request.setSort(Sort.valueOf(sort.toUpperCase()));

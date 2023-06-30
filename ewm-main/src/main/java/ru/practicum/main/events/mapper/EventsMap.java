@@ -46,7 +46,7 @@ public class EventsMap {
                 .annotation(newEventDto.getAnnotation())
                 .category(category)
                 .confirmedRequests(0)
-                .createdOn(LocalDateTime.now())
+                .createdOn(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
                 .description(newEventDto.getDescription())
                 .eventDate(LocalDateTime.parse(newEventDto.getEventDate(), formatter))
                 .initiator(user)

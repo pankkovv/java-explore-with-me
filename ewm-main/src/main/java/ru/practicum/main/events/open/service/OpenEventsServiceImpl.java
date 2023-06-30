@@ -1,5 +1,6 @@
 package ru.practicum.main.events.open.service;
 
+import com.google.gson.Gson;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +21,16 @@ import ru.practicum.main.events.model.QEvent;
 import ru.practicum.main.events.repository.EventsRepository;
 import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.exception.ValidTimeException;
+import ru.practicum.main.messages.ExceptionMessages;
+import ru.practicum.main.messages.LogMessages;
 import ru.practicum.main.stats.dto.RequestDto;
+import ru.practicum.main.stats.dto.ResponseDto;
 import ru.practicum.main.stats.model.StatsClient;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static ru.practicum.main.events.mapper.EventsMap.mapToEventFullDto;
 import static ru.practicum.main.events.mapper.EventsMap.mapToListEventShortDto;
@@ -37,10 +43,11 @@ public class OpenEventsServiceImpl implements OpenEventsService {
     @Autowired
     private EventsRepository repository;
     private final StatsClient statsClient;
+    Gson gson = new Gson();
 
     @Override
     public List<EventShortDto> getEvents(OpenEventRequests requests, HttpServletRequest request) {
-        statsClient.hit(RequestDto.builder().app(request.getPathInfo()).uri(request.getRequestURI()).ip(request.getRemoteAddr()).build());
+        statsClient.hit(RequestDto.builder().app("ewm-main-service").uri(request.getRequestURI()).ip(request.getRemoteAddr()).build());
 
         QEvent event = QEvent.event;
         List<BooleanExpression> conditions = new ArrayList<>();
@@ -61,14 +68,14 @@ public class OpenEventsServiceImpl implements OpenEventsService {
 
         if (requests.getRangeStart() != null && requests.getRangeEnd() != null) {
             if (requests.getRangeStart().isAfter(requests.getRangeEnd())) {
-                throw new ValidTimeException("Время старта не может быть позже времени окончания.");
+                throw new ValidTimeException(ExceptionMessages.VALID_TIME_EXCEPTION.label);
             } else {
                 conditions.add(event.eventDate.between(requests.getRangeStart(), requests.getRangeEnd()));
             }
         }
 
         if (requests.getOnlyAvailable() != null) {
-            conditions.add(event.confirmedRequests.between(0, event.participantLimit.getType().getModifiers()));
+            conditions.add(event.confirmedRequests.loe(event.participantLimit));
         }
 
         PageRequest pageRequest = PageRequest.of(requests.getFrom(), requests.getSize());
@@ -87,14 +94,16 @@ public class OpenEventsServiceImpl implements OpenEventsService {
         Page<Event> eventsPage = repository.findAll(finalCondition, pageRequest);
 
         if (eventsPage.isEmpty()) {
-            throw new NotFoundException("");
+            throw new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label);
         }
 
         for (Event eventViewed : eventsPage) {
-            eventViewed.setViews(eventViewed.getViews() + 1);
+            eventViewed.setViews(parseViews(eventViewed, request));
         }
+
         repository.saveAll(eventsPage);
 
+        log.debug(LogMessages.PUBLIC_GET_EVENT.label);
         return mapToListEventShortDto(eventsPage);
     }
 
@@ -102,11 +111,32 @@ public class OpenEventsServiceImpl implements OpenEventsService {
     public EventFullDto getEventsById(int eventId, HttpServletRequest request) {
         statsClient.hit(RequestDto.builder().app("ewm-main-service").uri(request.getRequestURI()).ip(request.getRemoteAddr()).build());
 
-        Event event = repository.findEventsByIdAndStateIs(eventId, EventStatus.PUBLISHED).orElseThrow(() -> new NotFoundException("Запись о событии не найдена."));
-        ResponseEntity<Object> response = statsClient.stats(event.getCreatedOn().toString(), event.getEventDate().toString(), List.of(request.getRequestURI()), true);
-        event.setViews(response.getStatusCodeValue());
+        Event event = repository.findEventsByIdAndStateIs(eventId, EventStatus.PUBLISHED).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+
+        event.setViews(parseViews(event, request));
+
         repository.save(event);
+
+        log.debug(LogMessages.PUBLIC_GET_EVENT_ID.label, eventId);
         return mapToEventFullDto(event);
+    }
+
+    private int parseViews(Event event, HttpServletRequest request) {
+        ResponseEntity<Object> response = statsClient.stats(event.getCreatedOn().toString().replace("T", " "),
+                event.getEventDate().toString().replace("T", " "),
+                List.of(request.getRequestURI()),
+                true);
+
+        if (response.getStatusCode().equals(HttpStatus.OK)) {
+            String body = Objects.requireNonNull(response.getBody()).toString()
+                    .replace("[{", "{\"")
+                    .replace("}]", "\"}")
+                    .replace("=", "\":\"")
+                    .replace(", ", "\",\"");
+            ResponseDto responseDto = gson.fromJson(body, ResponseDto.class);
+            return responseDto.getHits().intValue();
+        }
+        return event.getViews();
     }
 
     private Sort makeOrderByClause(OpenEventRequests.Sort sort) {

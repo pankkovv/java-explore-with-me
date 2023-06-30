@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.main.compilations.dto.CompilationDto;
 import ru.practicum.main.compilations.open.service.OpenCompilationsService;
+import ru.practicum.main.messages.LogMessages;
 
 import java.util.List;
 
@@ -20,14 +21,16 @@ public class OpenCompilationsController {
     OpenCompilationsService service;
 
     @GetMapping(path = "/compilations")
-    public List<CompilationDto> getCompilations(@RequestParam(name = "pinned", required = false) boolean pinned,
+    public List<CompilationDto> getCompilations(@RequestParam(name = "pinned", required = false) String pinned,
                                                 @RequestParam(name = "from", defaultValue = "0") int from,
                                                 @RequestParam(name = "size", defaultValue = "10") int size) {
+        log.debug(LogMessages.TRY_PUBLIC_GET_COMPILATIONS.label);
         return service.getCompilations(pinned, from, size);
     }
 
     @GetMapping(path = "/compilations/{compId}")
     public CompilationDto getCompilationsById(@PathVariable(name = "compId") int compId) {
+        log.debug(LogMessages.TRY_PUBLIC_GET_COMPILATIONS_ID.label, compId);
         return service.getCompilationsById(compId);
     }
 }

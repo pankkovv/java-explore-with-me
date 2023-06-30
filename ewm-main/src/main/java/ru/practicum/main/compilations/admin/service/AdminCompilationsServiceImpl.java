@@ -13,6 +13,8 @@ import ru.practicum.main.compilations.repository.CompilationsRepository;
 import ru.practicum.main.events.close.service.CloseEventsService;
 import ru.practicum.main.events.model.Event;
 import ru.practicum.main.exception.NotFoundException;
+import ru.practicum.main.messages.ExceptionMessages;
+import ru.practicum.main.messages.LogMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,22 +36,25 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
     public CompilationDto createCompilations(NewCompilationDto newCompilationDto) {
         List<Event> eventList = new ArrayList<>();
 
-        for (Integer eventId : newCompilationDto.getEvents()) {
-            eventList.add(eventsService.getEventById(eventId));
+        if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
+            for (Integer eventId : newCompilationDto.getEvents()) {
+                eventList.add(eventsService.getEventById(eventId));
+            }
         }
-
+        log.debug(LogMessages.ADMIN_POST_COMPILATIONS.label);
         return mapToCompilationsDto(compilationsRepository.save(mapToCompilations(newCompilationDto, eventList)));
     }
 
     @Override
     public void deleteCompilations(int compId) {
-        compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException("Подборка не найдена или недоступна."));
+        compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        log.debug(LogMessages.ADMIN_DELETE_COMPILATIONS_ID.label, compId);
         compilationsRepository.deleteById(compId);
     }
 
     @Override
     public CompilationDto changeCompilations(int compId, UpdateCompilationRequest updateCompilationRequest) {
-        Compilations oldCompilations = compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException("Подборка не найдена или недоступна."));
+        Compilations oldCompilations = compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
 
         if (updateCompilationRequest.getEvents() != null && !updateCompilationRequest.getEvents().isEmpty()) {
             List<Event> eventList = new ArrayList<>();
@@ -67,6 +72,7 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
             oldCompilations.setTitle(updateCompilationRequest.getTitle());
         }
 
+        log.debug(LogMessages.ADMIN_PATCH_COMPILATIONS_ID.label, compId);
         return mapToCompilationsDto(compilationsRepository.save(oldCompilations));
     }
 

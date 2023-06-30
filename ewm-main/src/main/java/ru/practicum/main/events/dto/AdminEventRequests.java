@@ -54,7 +54,6 @@ public class AdminEventRequests {
             request.setCategories(categories);
         }
 
-
         return request;
     }
 

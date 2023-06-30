@@ -39,6 +39,6 @@ public class StatsClient extends BaseClient {
                 "uris", uris,
                 "unique", unique
         );
-        return patch("/stats?start={start}&end={end}&uris={uris}&unique={unique}", null, parameters, null);
+        return get("/stats?start={start}&end={end}&uris={uris}&unique={unique}",  parameters);
     }
 }
