@@ -46,8 +46,6 @@ public class OpenEventsServiceImpl implements OpenEventsService {
 
     @Override
     public List<EventShortDto> getEvents(OpenEventRequests requests, HttpServletRequest request) {
-        statsClient.hit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr());
-
         QEvent event = QEvent.event;
         List<BooleanExpression> conditions = new ArrayList<>();
 
@@ -96,6 +94,7 @@ public class OpenEventsServiceImpl implements OpenEventsService {
             throw new NotFoundException(ExceptionMessages.NOT_FOUND_EVENTS_EXCEPTION.label);
         }
 
+        statsClient.hit(request);
         for (Event eventViewed : eventsPage) {
             eventViewed.setViews(parseViews(eventViewed, request));
         }
@@ -108,10 +107,9 @@ public class OpenEventsServiceImpl implements OpenEventsService {
 
     @Override
     public EventFullDto getEventsById(int eventId, HttpServletRequest request) {
-        statsClient.hit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr());
-
         Event event = repository.findEventsByIdAndStateIs(eventId, EventStatus.PUBLISHED).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EVENTS_EXCEPTION.label));
 
+        statsClient.hit(request);
         event.setViews(parseViews(event, request));
 
         repository.save(event);

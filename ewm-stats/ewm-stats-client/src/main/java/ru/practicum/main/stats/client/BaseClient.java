@@ -1,6 +1,7 @@
 package ru.practicum.main.stats.client;
 
 import org.springframework.http.*;
+import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.main.stats.dto.RequestDto;
@@ -15,26 +16,16 @@ public class BaseClient {
         this.rest = rest;
     }
 
-    protected ResponseEntity<Object> get(String path, Map<String, Object> parameters) {
-        return makeAndSendRequestGet(HttpMethod.GET, path, parameters);
+    protected ResponseEntity<Object> get(String path, @Nullable Map<String, Object> parameters) {
+        return makeAndSendRequest(HttpMethod.GET, path, parameters, null);
     }
 
     protected void post(String path, RequestDto body) {
-        makeAndSendRequestPost(HttpMethod.POST, path, body);
+        makeAndSendRequest(HttpMethod.POST, path, null, body);
     }
 
-    private void makeAndSendRequestPost(HttpMethod method, String path, RequestDto body) {
-        HttpEntity<RequestDto> requestEntity = new HttpEntity<>(body, defaultHeaders());
-
-        try {
-            rest.exchange(path, method, requestEntity, Object.class);
-        } catch (HttpStatusCodeException e) {
-            throw new RuntimeException(e.getResponseBodyAsString());
-        }
-    }
-
-    private <T> ResponseEntity<Object> makeAndSendRequestGet(HttpMethod method, String path, Map<String, Object> parameters) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(defaultHeaders());
+    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String, Object> parameters, @Nullable T body) {
+        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
 
         ResponseEntity<Object> statsServerResponse;
         try {
