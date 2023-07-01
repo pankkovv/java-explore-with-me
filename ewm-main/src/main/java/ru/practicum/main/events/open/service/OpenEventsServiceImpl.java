@@ -23,7 +23,6 @@ import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.exception.ValidTimeException;
 import ru.practicum.main.messages.ExceptionMessages;
 import ru.practicum.main.messages.LogMessages;
-import ru.practicum.main.stats.dto.RequestDto;
 import ru.practicum.main.stats.dto.ResponseDto;
 import ru.practicum.main.stats.model.StatsClient;
 
@@ -43,11 +42,11 @@ public class OpenEventsServiceImpl implements OpenEventsService {
     @Autowired
     private EventsRepository repository;
     private final StatsClient statsClient;
-    Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
     @Override
     public List<EventShortDto> getEvents(OpenEventRequests requests, HttpServletRequest request) {
-        statsClient.hit(RequestDto.builder().app("ewm-main-service").uri(request.getRequestURI()).ip(request.getRemoteAddr()).build());
+        statsClient.hit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr());
 
         QEvent event = QEvent.event;
         List<BooleanExpression> conditions = new ArrayList<>();
@@ -109,7 +108,7 @@ public class OpenEventsServiceImpl implements OpenEventsService {
 
     @Override
     public EventFullDto getEventsById(int eventId, HttpServletRequest request) {
-        statsClient.hit(RequestDto.builder().app("ewm-main-service").uri(request.getRequestURI()).ip(request.getRemoteAddr()).build());
+        statsClient.hit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr());
 
         Event event = repository.findEventsByIdAndStateIs(eventId, EventStatus.PUBLISHED).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EVENTS_EXCEPTION.label));
 
