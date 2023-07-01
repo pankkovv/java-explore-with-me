@@ -47,14 +47,14 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
 
     @Override
     public void deleteCompilations(int compId) {
-        compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_COMPILATIONS_EXCEPTION.label));
         log.debug(LogMessages.ADMIN_DELETE_COMPILATIONS_ID.label, compId);
         compilationsRepository.deleteById(compId);
     }
 
     @Override
     public CompilationDto changeCompilations(int compId, UpdateCompilationRequest updateCompilationRequest) {
-        Compilations oldCompilations = compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        Compilations oldCompilations = compilationsRepository.findById(compId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_COMPILATIONS_EXCEPTION.label));
 
         if (updateCompilationRequest.getEvents() != null && !updateCompilationRequest.getEvents().isEmpty()) {
             List<Event> eventList = new ArrayList<>();
@@ -75,5 +75,4 @@ public class AdminCompilationsServiceImpl implements AdminCompilationsService {
         log.debug(LogMessages.ADMIN_PATCH_COMPILATIONS_ID.label, compId);
         return mapToCompilationsDto(compilationsRepository.save(oldCompilations));
     }
-
 }

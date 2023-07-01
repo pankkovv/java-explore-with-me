@@ -27,7 +27,6 @@ public class OpenCompilationsServiceImpl implements OpenCompilationsService {
     private CompilationsRepository repository;
 
     @Transactional(readOnly = true)
-
     @Override
     public List<CompilationDto> getCompilations(String pinned, int from, int size) {
         Pageable page = paged(from, size);
@@ -36,11 +35,10 @@ public class OpenCompilationsServiceImpl implements OpenCompilationsService {
     }
 
     @Transactional(readOnly = true)
-
     @Override
     public CompilationDto getCompilationsById(int compId) {
         log.debug(LogMessages.PUBLIC_GET_COMPILATIONS_ID.label, compId);
-        return mapToCompilationsDto(repository.findById(compId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label)));
+        return mapToCompilationsDto(repository.findById(compId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_COMPILATIONS_EXCEPTION.label)));
     }
 
     private Pageable paged(Integer from, Integer size) {

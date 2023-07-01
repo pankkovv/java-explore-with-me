@@ -36,18 +36,16 @@ public class OpenCategoriesServiceImpl implements OpenCategoriesService {
     }
 
     @Transactional(readOnly = true)
-
     @Override
     public CategoryDto getCategoriesById(int catId) {
         log.debug(LogMessages.PUBLIC_GET_CATEGORIES_ID.label, catId);
-        return mapToCategoryDto(repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label)));
+        return mapToCategoryDto(repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_CATEGORIES_EXCEPTION.label)));
     }
 
     @Transactional(readOnly = true)
-
     @Override
     public Category getCatById(int catId) {
-        return repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        return repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_COMPILATIONS_EXCEPTION.label));
     }
 
     private Pageable paged(Integer from, Integer size) {

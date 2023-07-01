@@ -38,7 +38,6 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
     @Autowired
     private CloseEventsService eventsService;
 
-    @Transactional(readOnly = true)
     @Override
     public List<ParticipationRequestDto> getRequestsByUserOtherEvents(int userId) {
         usersService.getUserById(userId);
@@ -93,7 +92,7 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
 
     @Override
     public ParticipationRequestDto cancelRequestsByUserOtherEvents(int userId, int requestId) {
-        ParticipationRequest request = repository.findParticipationRequestByIdAndRequester_Id(requestId, userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        ParticipationRequest request = repository.findParticipationRequestByIdAndRequester_Id(requestId, userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_REQUESTS_EXCEPTION.label));
         request.setStatus(StatusEventRequestUpdateResult.CANCELED);
 
         log.debug(LogMessages.PRIVATE_PATCH_REQUESTS_USER_ID.label, userId);
@@ -112,7 +111,7 @@ public class CloseRequestsServiceImpl implements CloseRequestsService {
         List<ParticipationRequest> requestList = repository.findParticipationRequestsByEventsWithRequests_IdAndEventsWithRequests_Initiator_Id(eventId, userId);
 
         if (requestList.isEmpty()) {
-            throw new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label);
+            throw new NotFoundException(ExceptionMessages.NOT_FOUND_REQUESTS_EXCEPTION.label);
         }
 
         for (ParticipationRequest request : requestList) {

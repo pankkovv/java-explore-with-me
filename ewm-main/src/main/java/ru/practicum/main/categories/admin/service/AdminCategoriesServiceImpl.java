@@ -32,7 +32,7 @@ public class AdminCategoriesServiceImpl implements AdminCategoriesService {
 
     @Override
     public void deleteCategories(int catId) {
-        repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_CATEGORIES_EXCEPTION.label));
         repository.deleteById(catId);
     }
 
@@ -49,6 +49,6 @@ public class AdminCategoriesServiceImpl implements AdminCategoriesService {
     @Transactional(readOnly = true)
     @Override
     public Category findCategoriesById(int catId) {
-        return repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        return repository.findById(catId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_CATEGORIES_EXCEPTION.label));
     }
 }

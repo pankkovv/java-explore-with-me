@@ -70,12 +70,12 @@ public class CloseEventsServiceImpl implements CloseEventsService {
     @Override
     public EventFullDto getEventsByUserFullInfo(int userId, int eventId) {
         log.debug(LogMessages.PRIVATE_GET_EVENT_USER.label, userId);
-        return mapToEventFullDto(repository.findEventByIdAndInitiator_Id(eventId, userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label)));
+        return mapToEventFullDto(repository.findEventByIdAndInitiator_Id(eventId, userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EVENTS_EXCEPTION.label)));
     }
 
     @Override
     public EventFullDto changeEventsByUser(int userId, int eventId, UpdateEventUserRequest updateEventUserRequest) {
-        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EVENTS_EXCEPTION.label));
 
         if (event.getState().equals(EventStatus.PENDING) || event.getState().equals(EventStatus.CANCELED)) {
             if (updateEventUserRequest.getEventDate() != null) {
@@ -124,10 +124,9 @@ public class CloseEventsServiceImpl implements CloseEventsService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Event getEventById(int eventId) {
-        return repository.findById(eventId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        return repository.findById(eventId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EVENTS_EXCEPTION.label));
     }
 
     private void validTime(String time) {

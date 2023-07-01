@@ -10,72 +10,69 @@ import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.exception.ValidTimeException;
 import ru.practicum.main.exception.model.ApiError;
 import ru.practicum.main.exception.model.ExceptionStatus;
+import ru.practicum.main.messages.ExceptionMessages;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 
 @RestControllerAdvice
 public class ErrorHandler {
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFoundException(final NotFoundException e) {
-        ApiError error = new ApiError();
-        error.setErrors(List.of(Arrays.toString(e.getStackTrace())));
-        error.setMessage(error.getMessage());
-        error.setReason("Искомый объект не найден.");
-        error.setStatus(ExceptionStatus.NOT_FOUND.toString());
-        error.setTimestamp(LocalDateTime.now());
-        return error;
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason(ExceptionMessages.NOT_FOUND_EXCEPTION.label)
+                .status(ExceptionStatus.NOT_FOUND.toString())
+                .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
+                .build();
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleValidTimeException(final ValidTimeException e) {
-        ApiError error = new ApiError();
-        error.setErrors(List.of(Arrays.toString(e.getStackTrace())));
-        error.setMessage(error.getMessage());
-        error.setReason("Запрос составлен некорректно.");
-        error.setStatus(ExceptionStatus.NOT_FOUND.toString());
-        error.setTimestamp(LocalDateTime.now());
-        return error;
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason(ExceptionMessages.VALID_TIME_EXCEPTION.label)
+                .status(ExceptionStatus.BAD_REQUEST.toString())
+                .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
+                .build();
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleConflictException(final ConflictException e) {
-        ApiError error = new ApiError();
-        error.setErrors(List.of(Arrays.toString(e.getStackTrace())));
-        error.setMessage(e.getMessage());
-        error.setReason("Нарушение целостности данных.");
-        error.setStatus(ExceptionStatus.NOT_FOUND.toString());
-        error.setTimestamp(LocalDateTime.now());
-        return error;
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason(ExceptionMessages.CONFLICT_EXCEPTION.label)
+                .status(ExceptionStatus.CONFLICT.toString())
+                .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
+                .build();
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleConflictException(final SQLException e) {
-        ApiError error = new ApiError();
-        error.setErrors(List.of(Arrays.toString(e.getStackTrace())));
-        error.setMessage(e.getMessage());
-        error.setReason("Нарушение целостности данных.");
-        error.setStatus(ExceptionStatus.NOT_FOUND.toString());
-        error.setTimestamp(LocalDateTime.now());
-        return error;
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason(ExceptionMessages.CONFLICT_EXCEPTION.label)
+                .status(ExceptionStatus.CONFLICT.toString())
+                .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
+                .build();
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleConflictException(final MethodArgumentNotValidException e) {
-        ApiError error = new ApiError();
-        error.setErrors(List.of(Arrays.toString(e.getStackTrace())));
-        error.setMessage(e.getMessage());
-        error.setReason("Запрос составлен некорректно.");
-        error.setStatus(ExceptionStatus.NOT_FOUND.toString());
-        error.setTimestamp(LocalDateTime.now());
-        return error;
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason(ExceptionMessages.CONFLICT_EXCEPTION.label)
+                .status(ExceptionStatus.BAD_REQUEST.toString())
+                .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
+                .build();
     }
 }

@@ -91,10 +91,9 @@ public class AdminEventsServiceImpl implements AdminEventsService {
         return mapToListEventFullDto(eventsPage);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public EventFullDto changeEvents(int eventId, UpdateEventAdminRequest updateEventAdminRequest) {
-        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        Event event = repository.findById(eventId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EVENTS_EXCEPTION.label));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         if (updateEventAdminRequest.getAnnotation() != null) {

@@ -10,13 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserMap {
-    public static User mapToUser(UserDto userDto) {
-        return User.builder()
-                .name(userDto.getName())
-                .email(userDto.getEmail())
-                .build();
-    }
-
     public static User mapToUser(NewUserRequest userRequest) {
         return User.builder()
                 .name(userRequest.getName())

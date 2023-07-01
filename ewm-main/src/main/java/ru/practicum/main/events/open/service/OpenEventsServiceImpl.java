@@ -94,7 +94,7 @@ public class OpenEventsServiceImpl implements OpenEventsService {
         Page<Event> eventsPage = repository.findAll(finalCondition, pageRequest);
 
         if (eventsPage.isEmpty()) {
-            throw new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label);
+            throw new NotFoundException(ExceptionMessages.NOT_FOUND_EVENTS_EXCEPTION.label);
         }
 
         for (Event eventViewed : eventsPage) {
@@ -111,7 +111,7 @@ public class OpenEventsServiceImpl implements OpenEventsService {
     public EventFullDto getEventsById(int eventId, HttpServletRequest request) {
         statsClient.hit(RequestDto.builder().app("ewm-main-service").uri(request.getRequestURI()).ip(request.getRemoteAddr()).build());
 
-        Event event = repository.findEventsByIdAndStateIs(eventId, EventStatus.PUBLISHED).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        Event event = repository.findEventsByIdAndStateIs(eventId, EventStatus.PUBLISHED).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EVENTS_EXCEPTION.label));
 
         event.setViews(parseViews(event, request));
 

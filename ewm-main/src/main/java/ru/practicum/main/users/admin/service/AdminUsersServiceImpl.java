@@ -48,7 +48,7 @@ public class AdminUsersServiceImpl implements AdminUsersService {
 
     @Override
     public void deleteUsers(int userId) {
-        repository.findById(userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        repository.findById(userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_USERS_EXCEPTION.label));
 
         log.debug(LogMessages.ADMIN_DELETE_USERS.label, userId);
         repository.deleteById(userId);
@@ -57,7 +57,7 @@ public class AdminUsersServiceImpl implements AdminUsersService {
     @Transactional(readOnly = true)
     @Override
     public User getUserById(int userId) {
-        return repository.findById(userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_EXCEPTION.label));
+        return repository.findById(userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_USERS_EXCEPTION.label));
     }
 
     private Pageable paged(Integer from, Integer size) {
