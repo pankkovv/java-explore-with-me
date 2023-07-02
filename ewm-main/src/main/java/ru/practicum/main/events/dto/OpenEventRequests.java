@@ -2,6 +2,7 @@ package ru.practicum.main.events.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.main.events.model.SortEvents;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +17,7 @@ public class OpenEventRequests {
     private LocalDateTime rangeStart;
     private LocalDateTime rangeEnd;
     private Boolean onlyAvailable;
-    private Sort sort;
+    private SortEvents sortEvents;
     private Integer from;
     private Integer size;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -49,7 +50,7 @@ public class OpenEventRequests {
         }
 
         if (sort != null) {
-            request.setSort(Sort.valueOf(sort.toUpperCase()));
+            request.setSortEvents(SortEvents.valueOf(sort.toUpperCase()));
         }
 
         request.setFrom(from);
@@ -64,10 +65,5 @@ public class OpenEventRequests {
 
     public boolean hasCategories() {
         return categories != null && !categories.isEmpty();
-    }
-
-    public enum Sort {
-        EVENT_DATE,
-        VIEWS
     }
 }

@@ -28,7 +28,7 @@ import static ru.practicum.main.compilations.mapper.CompMap.mapToCompilationsDto
 @Slf4j
 public class AdminCompilationsServiceImpl implements AdminCompilationsService {
     @Autowired
-    CompilationsRepository compilationsRepository;
+    private CompilationsRepository compilationsRepository;
     @Autowired
     private CloseEventsService eventsService;
 

@@ -3,7 +3,6 @@ package ru.practicum.main.compilations.open.service;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +16,7 @@ import java.util.List;
 
 import static ru.practicum.main.compilations.mapper.CompMap.mapToCompilationsDto;
 import static ru.practicum.main.compilations.mapper.CompMap.mapToListCompilationsDto;
+import static ru.practicum.main.utils.Page.paged;
 
 @Service
 @Transactional
@@ -39,18 +39,5 @@ public class OpenCompilationsServiceImpl implements OpenCompilationsService {
     public CompilationDto getCompilationsById(int compId) {
         log.debug(LogMessages.PUBLIC_GET_COMPILATIONS_ID.label, compId);
         return mapToCompilationsDto(repository.findById(compId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_COMPILATIONS_EXCEPTION.label)));
-    }
-
-    private Pageable paged(Integer from, Integer size) {
-        Pageable page;
-        if (from != null && size != null) {
-            if (from < 0 || size < 0) {
-                throw new RuntimeException();
-            }
-            page = PageRequest.of(from > 0 ? from / size : 0, size);
-        } else {
-            page = PageRequest.of(0, 4);
-        }
-        return page;
     }
 }

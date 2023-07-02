@@ -18,6 +18,7 @@ import ru.practicum.main.events.dto.OpenEventRequests;
 import ru.practicum.main.events.model.Event;
 import ru.practicum.main.events.model.EventStatus;
 import ru.practicum.main.events.model.QEvent;
+import ru.practicum.main.events.model.SortEvents;
 import ru.practicum.main.events.repository.EventsRepository;
 import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.exception.ValidTimeException;
@@ -77,8 +78,8 @@ public class OpenEventsServiceImpl implements OpenEventsService {
 
         PageRequest pageRequest = PageRequest.of(requests.getFrom(), requests.getSize());
 
-        if (requests.getSort() != null) {
-            Sort sort = makeOrderByClause(requests.getSort());
+        if (requests.getSortEvents() != null) {
+            Sort sort = makeOrderByClause(requests.getSortEvents());
             pageRequest = PageRequest.of(requests.getFrom(), requests.getSize(), sort);
         }
 
@@ -136,8 +137,8 @@ public class OpenEventsServiceImpl implements OpenEventsService {
         return event.getViews();
     }
 
-    private Sort makeOrderByClause(OpenEventRequests.Sort sort) {
-        switch (sort) {
+    private Sort makeOrderByClause(SortEvents sortEvents) {
+        switch (sortEvents) {
             case EVENT_DATE:
                 return Sort.by("eventDate").descending();
             case VIEWS:

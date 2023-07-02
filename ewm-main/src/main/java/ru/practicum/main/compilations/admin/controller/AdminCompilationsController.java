@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @Slf4j
 public class AdminCompilationsController {
     @Autowired
-    AdminCompilationsService service;
+    private AdminCompilationsService service;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path = "/compilations")

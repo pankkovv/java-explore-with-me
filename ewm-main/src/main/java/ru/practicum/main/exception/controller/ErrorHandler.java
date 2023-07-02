@@ -9,7 +9,6 @@ import ru.practicum.main.exception.ConflictException;
 import ru.practicum.main.exception.NotFoundException;
 import ru.practicum.main.exception.ValidTimeException;
 import ru.practicum.main.exception.model.ApiError;
-import ru.practicum.main.exception.model.ExceptionStatus;
 import ru.practicum.main.messages.ExceptionMessages;
 
 import java.sql.SQLException;
@@ -27,7 +26,7 @@ public class ErrorHandler {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason(ExceptionMessages.NOT_FOUND_EXCEPTION.label)
-                .status(ExceptionStatus.NOT_FOUND.toString())
+                .status(HttpStatus.NOT_FOUND.toString())
                 .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
                 .build();
     }
@@ -38,7 +37,7 @@ public class ErrorHandler {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason(ExceptionMessages.VALID_TIME_EXCEPTION.label)
-                .status(ExceptionStatus.BAD_REQUEST.toString())
+                .status(HttpStatus.BAD_REQUEST.toString())
                 .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
                 .build();
     }
@@ -49,7 +48,7 @@ public class ErrorHandler {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason(ExceptionMessages.CONFLICT_EXCEPTION.label)
-                .status(ExceptionStatus.CONFLICT.toString())
+                .status(HttpStatus.CONFLICT.toString())
                 .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
                 .build();
     }
@@ -60,7 +59,7 @@ public class ErrorHandler {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason(ExceptionMessages.CONFLICT_EXCEPTION.label)
-                .status(ExceptionStatus.CONFLICT.toString())
+                .status(HttpStatus.CONFLICT.toString())
                 .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
                 .build();
     }
@@ -71,7 +70,7 @@ public class ErrorHandler {
         return ApiError.builder()
                 .message(e.getMessage())
                 .reason(ExceptionMessages.CONFLICT_EXCEPTION.label)
-                .status(ExceptionStatus.BAD_REQUEST.toString())
+                .status(HttpStatus.BAD_REQUEST.toString())
                 .timestamp(LocalDateTime.parse(LocalDateTime.now().format(formatter), formatter))
                 .build();
     }

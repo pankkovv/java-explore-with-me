@@ -3,7 +3,6 @@ package ru.practicum.main.users.admin.service;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +17,7 @@ import ru.practicum.main.users.repository.UsersRepository;
 import java.util.List;
 
 import static ru.practicum.main.users.mapper.UserMap.*;
+import static ru.practicum.main.utils.Page.paged;
 
 @Service
 @Transactional
@@ -58,18 +58,5 @@ public class AdminUsersServiceImpl implements AdminUsersService {
     @Override
     public User getUserById(int userId) {
         return repository.findById(userId).orElseThrow(() -> new NotFoundException(ExceptionMessages.NOT_FOUND_USERS_EXCEPTION.label));
-    }
-
-    private Pageable paged(Integer from, Integer size) {
-        Pageable page;
-        if (from != null && size != null) {
-            if (from < 0 || size < 0) {
-                throw new RuntimeException();
-            }
-            page = PageRequest.of(from > 0 ? from / size : 0, size);
-        } else {
-            page = PageRequest.of(0, 4);
-        }
-        return page;
     }
 }

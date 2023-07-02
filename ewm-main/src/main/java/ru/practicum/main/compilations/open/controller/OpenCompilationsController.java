@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 public class OpenCompilationsController {
     @Autowired
-    OpenCompilationsService service;
+    private OpenCompilationsService service;
 
     @GetMapping(path = "/compilations")
     public List<CompilationDto> getCompilations(@RequestParam(name = "pinned", required = false) String pinned,

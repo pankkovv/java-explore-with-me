@@ -20,6 +20,9 @@ public class StatsClient extends BaseClient {
     @Value("${stats-server.url}")
     private String serverUrl;
 
+    @Value("${main-app.name}")
+    private String appMain;
+
     @Autowired
     public StatsClient(RestTemplateBuilder builder) {
         super(
@@ -32,7 +35,7 @@ public class StatsClient extends BaseClient {
 
     public void hit(HttpServletRequest request) {
         RequestDto requestDto = RequestDto.builder()
-                .app("ewm-main-service")
+                .app(appMain)
                 .uri(request.getRequestURI())
                 .ip(request.getRemoteAddr())
                 .build();

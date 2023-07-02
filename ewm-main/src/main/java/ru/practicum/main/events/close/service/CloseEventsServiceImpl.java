@@ -3,7 +3,6 @@ package ru.practicum.main.events.close.service;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +31,7 @@ import java.util.List;
 
 import static ru.practicum.main.categories.mapper.CatMap.mapToCategory;
 import static ru.practicum.main.events.mapper.EventsMap.*;
+import static ru.practicum.main.utils.Page.paged;
 
 @Service
 @Transactional
@@ -136,18 +136,5 @@ public class CloseEventsServiceImpl implements CloseEventsService {
         if (Duration.between(LocalDateTime.now(), startDate).toMinutes() < Duration.ofHours(2).toMinutes()) {
             throw new ValidTimeException(ExceptionMessages.VALID_TIME_EXCEPTION.label);
         }
-    }
-
-    private Pageable paged(Integer from, Integer size) {
-        Pageable page;
-        if (from != null && size != null) {
-            if (from < 0 || size < 0) {
-                throw new RuntimeException();
-            }
-            page = PageRequest.of(from > 0 ? from / size : 0, size);
-        } else {
-            page = PageRequest.of(0, 4);
-        }
-        return page;
     }
 }
