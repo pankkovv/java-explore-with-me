@@ -52,7 +52,20 @@ public enum LogMessages {
     ADMIN_DELETE_USERS("Admin: Успешное удаление пользователя по id: {}."),
     ADMIN_POST_COMPILATIONS("Admin: Успешное добавление новой подборки."),
     ADMIN_DELETE_COMPILATIONS_ID("Admin: Успешное удаление подборки по id: {}."),
-    ADMIN_PATCH_COMPILATIONS_ID("Admin: Успешное обновление информации о подборке по id: {}.");
+    ADMIN_PATCH_COMPILATIONS_ID("Admin: Успешное обновление информации о подборке по id: {}."),
+    TRY_PRIVATE_POST_SUBSCRIPTIONS("Попытка подписаться на пользователя id: {}."),
+    TRY_PRIVATE_DELETE_SUBSCRIPTIONS("Попытка отписаться от пользователя id: {}."),
+    TRY_PRIVATE_GET_SUBSCRIPTIONS("Попытка посмотреть событий пользователей из подписок."),
+    TRY_PRIVATE_GET_SUBSCRIPTIONS_ID("Попытка посмотреть событий пользователя из подписок id: {}."),
+    TRY_PRIVATE_GET_SUBSCRIBERS("Попытка посмотреть событий подписчиков."),
+    TRY_PRIVATE_GET_SUBSCRIBERS_ID("Попытка посмотреть событий подписчика id: {}."),
+    PRIVATE_POST_SUBSCRIPTIONS("Успешная подписка на пользователя id: {}."),
+    PRIVATE_DELETE_SUBSCRIPTIONS("Успешная отписка от пользователя id: {}."),
+    PRIVATE_GET_SUBSCRIPTIONS("Успешный просмотр событий пользователей из подписок."),
+    PRIVATE_GET_SUBSCRIPTIONS_ID("Успешный просмотр событий пользователя из подписок id: {}."),
+    PRIVATE_GET_SUBSCRIBERS("Успешный просмотр событий подписчиков."),
+    PRIVATE_GET_SUBSCRIBERS_ID("Успешный просмотр событий подписчика id: {}.");
+
 
     public final String label;
 
