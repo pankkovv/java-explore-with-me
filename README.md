@@ -1,3 +1,4 @@
+# PR feature_subscriptions https://github.com/pankkovv/java-explore-with-me/pull/11
 # java-explore-with-me
 ## Описание приложения
 Бекэнд сервиса-афишы, в котором можно предложить какое-либо событие.
