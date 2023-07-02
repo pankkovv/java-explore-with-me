@@ -53,10 +53,16 @@ public class StatsServiceImpl implements StatsService {
         if (uri != null && !uri.isEmpty()) {
             if (unique) {
                 for (String u : uri) {
+                    if (u.contains("[")) {
+                        u = u.substring(u.indexOf('/'), u.indexOf(']'));
+                    }
                     listResponseStat.addAll(repository.findStatUriUnique(timeStart, timeEnd, u));
                 }
             } else {
                 for (String u : uri) {
+                    if (u.contains("[")) {
+                        u = u.substring(u.indexOf('/'), u.indexOf(']'));
+                    }
                     listResponseStat.addAll(repository.findStatUri(timeStart, timeEnd, u));
                 }
             }

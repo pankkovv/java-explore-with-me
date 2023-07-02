@@ -10,27 +10,41 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.main.stats.client.BaseClient;
 import ru.practicum.main.stats.dto.RequestDto;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class StatsClient extends BaseClient {
+
+    @Value("${stats-server.url}")
+    private String serverUrl;
+
+    @Value("${main-app.name}")
+    private String appMain;
+
     @Autowired
-    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public StatsClient(RestTemplateBuilder builder) {
         super(
                 builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
+                        .uriTemplateHandler(new DefaultUriBuilderFactory())
                         .requestFactory(HttpComponentsClientHttpRequestFactory::new)
                         .build()
         );
     }
 
-    public ResponseEntity<Object> hit(RequestDto requestDto) {
-        return post("/hit", null, null, requestDto);
+    public void hit(HttpServletRequest request) {
+        RequestDto requestDto = RequestDto.builder()
+                .app(appMain)
+                .uri(request.getRequestURI())
+                .ip(request.getRemoteAddr())
+                .build();
+        post(serverUrl + "/hit", requestDto);
     }
 
     public ResponseEntity<Object> stats(String start,
                                         String end,
-                                        String[] uris,
+                                        List<String> uris,
                                         boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
@@ -38,6 +52,7 @@ public class StatsClient extends BaseClient {
                 "uris", uris,
                 "unique", unique
         );
-        return patch("/stats?start={start}&end={end}&uris={uris}&unique={unique}", null, parameters, null);
+
+        return get(serverUrl + "/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
     }
 }
