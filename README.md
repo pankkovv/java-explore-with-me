@@ -65,7 +65,7 @@ Admin:
 10. Удаление подборки: DELETE http://localhost:8080/admin/compilations/{compId}
 11. Обновить информацию о подборке: PATCH http://localhost:8080/admin/compilations/{compId}
 
-## Пример взаимодествия с БД
+## Пример взаимодействия с БД
 ER diagram
 
 Main:
