@@ -102,7 +102,7 @@ public CategoryDto changeCategories(int catId,CategoryDto categoryDto){
 
 ## Стек
 
-- Java SE 9
+- JDK 11
 - Spring Boot
 - Spring Data JPA
 - Hibernate
